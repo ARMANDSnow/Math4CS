@@ -2,14 +2,14 @@
 course: Math4CS
 chapter: NA3
 topic: 设计与分析线性系统 / 最小二乘与参数回归 Least Squares & Regression
-teacher: A · 应凯
+teacher: 应凯
 date: 2026-06-19
 tags: [Math4CS, 数值算法, 最小二乘, 回归, 正规方程, 正则化, Tikhonov, Cholesky]
 ---
 
 # NA3 最小二乘与参数回归（Least Squares & Regression）
 
-> 来源：A 老师 `3-DesignAnalyLinearSys.pptx`（教材 Solomon 第 3–4 章）· 考纲第 3 章
+> 来源：应凯老师 `3-DesignAnalyLinearSys.pptx`（教材 Solomon 第 3–4 章）· 考纲第 3 章
 > 一句话定位：给一堆（带噪声的）数据，找最符合它们的模型参数。当数据多于参数（超定）无法精确拟合时，就退而求"误差平方和最小"——这就是最小二乘。
 > **考纲地位：大题（参数估计 + 最小二乘）。** 旧真题 Q7(1) 图像去模糊 6 分直接考。Cholesky 分解"不考计算"但概念/关系会考。
 
@@ -27,6 +27,7 @@ tags: [Math4CS, 数值算法, 最小二乘, 回归, 正规方程, 正则化, Tik
 11. 考点雷达
 12. 易错点 & 陷阱
 13. 本章速查卡
+14. 练习题（自测）
 
 ---
 
@@ -287,3 +288,134 @@ $$L=\begin{bmatrix}2&0&0\\-1&2&0\\2&-1&3\end{bmatrix}$$
 **Gram 矩阵 $A^\top A$**：对称、半正定（列满秩则正定可逆）。
 
 **Cholesky**（SPD，不考计算但考概念）：$A=LL^\top$，$L$ 下三角，省一半内存；$l_{jj}=\sqrt{a_{jj}-\sum_{k<j}l_{jk}^2}$，$l_{ij}=(a_{ij}-\sum_{k<j}l_{ik}l_{jk})/l_{jj}$。
+
+---
+
+## 14. 练习题（自测）
+
+> 仿期末 / 作业风格，全新设定与数字，与上文例题、原作业均不重复。建议先独立做完，再展开核对答案。
+
+### 练习 1 · 正规方程做最小二乘直线拟合（仿真题 Q7、作业风格，⭐⭐，约 8 分）
+
+某次实验测得 4 个数据点 $(x_i,y_i)$：
+
+$$(0,\,1),\quad (1,\,2),\quad (2,\,2),\quad (3,\,5)$$
+
+用最小二乘拟合一条直线 $y=kx+b$。
+
+1. 写出超定方程 $A\begin{bmatrix}k\\b\end{bmatrix}=\vec b$ 中的设计矩阵 $A$ 与右端向量 $\vec b$。
+2. 由正规方程 $A^\top A\begin{bmatrix}k\\b\end{bmatrix}=A^\top\vec b$ 解出 $k$、$b$（给出分数或小数）。
+3. 验证你的解满足正规方程，并说明残差向量与 $A$ 各列正交意味着什么。
+
+<details>
+<summary>📖 参考答案</summary>
+
+**第 1 步：搭建 $A$ 与 $\vec b$。** 每行把一个 $x_i$ 代入基函数 $\phi_1(x)=x,\ \phi_2(x)=1$，参数向量取 $\begin{bmatrix}k\\b\end{bmatrix}$：
+
+$$A=\begin{bmatrix}0&1\\1&1\\2&1\\3&1\end{bmatrix},\qquad \vec b=\begin{bmatrix}1\\2\\2\\5\end{bmatrix}$$
+
+**第 2 步：组装正规方程。** 利用 $A^\top A=\begin{bmatrix}\sum x_i^2&\sum x_i\\\sum x_i&m\end{bmatrix}$、$A^\top\vec b=\begin{bmatrix}\sum x_iy_i\\\sum y_i\end{bmatrix}$：
+
+- $\sum x_i^2=0+1+4+9=14$，$\sum x_i=0+1+2+3=6$，$m=4$
+- $\sum x_iy_i=0\cdot1+1\cdot2+2\cdot2+3\cdot5=21$，$\sum y_i=1+2+2+5=10$
+
+$$A^\top A=\begin{bmatrix}14&6\\6&4\end{bmatrix},\qquad A^\top\vec b=\begin{bmatrix}21\\10\end{bmatrix}$$
+
+**第 3 步：求逆解方程。** $\det(A^\top A)=14\cdot4-6\cdot6=56-36=20$，
+
+$$(A^\top A)^{-1}=\frac{1}{20}\begin{bmatrix}4&-6\\-6&14\end{bmatrix}$$
+
+$$\begin{bmatrix}k\\b\end{bmatrix}=\frac{1}{20}\begin{bmatrix}4&-6\\-6&14\end{bmatrix}\begin{bmatrix}21\\10\end{bmatrix}=\frac{1}{20}\begin{bmatrix}84-60\\-126+140\end{bmatrix}=\frac{1}{20}\begin{bmatrix}24\\14\end{bmatrix}=\begin{bmatrix}1.2\\0.7\end{bmatrix}$$
+
+即 $\boxed{k=\dfrac{6}{5}=1.2,\quad b=\dfrac{7}{10}=0.7}$，拟合直线 $y=1.2x+0.7$。
+
+**第 4 步：验证。** 代回正规方程：
+
+- 第 1 行：$14(1.2)+6(0.7)=16.8+4.2=21$ ✓
+- 第 2 行：$6(1.2)+4(0.7)=7.2+2.8=10$ ✓
+
+残差 $\vec r=A\begin{bmatrix}k\\b\end{bmatrix}-\vec b$：预测值依次为 $0.7,\,1.9,\,3.1,\,4.3$，故 $\vec r=(-0.3,\,-0.1,\,1.1,\,-0.7)$。正规方程 $A^\top(A x-\vec b)=0$ 恰是 $A^\top\vec r=0$，即 $\vec r$ 与 $A$ 的两列都正交：
+
+- 与 1 列正交 → $\sum r_i=-0.3-0.1+1.1-0.7=0$ ✓（残差和为 0）
+- 与 $x$ 列正交 → $\sum x_ir_i=0(-0.3)+1(-0.1)+2(1.1)+3(-0.7)=-0.1+2.2-2.1=0$ ✓
+
+**几何含义**：残差向量垂直于 $A$ 的列空间，即 $A\begin{bmatrix}k\\b\end{bmatrix}$ 是 $\vec b$ 在列空间上的正交投影——这正是"正规（normal=正交）方程"得名的由来。
+
+</details>
+
+### 练习 2 · Tikhonov 正则化（岭回归）的正规方程（仿真题 Q7(1)，⭐⭐，约 8 分）
+
+给定超定系统
+
+$$A=\begin{bmatrix}1&0\\1&1\\1&2\end{bmatrix},\qquad \vec b=\begin{bmatrix}1\\1\\4\end{bmatrix}$$
+
+1. 写出 Tikhonov 正则化问题 $\min_x\lVert Ax-\vec b\rVert_2^2+\lambda\lVert x\rVert_2^2$ 对应的正规方程，并说明 $\lambda I$ 起什么作用。
+2. 取 $\lambda=1$，解出正则化解 $x_\lambda$。
+3. 再解 $\lambda=0$ 的普通最小二乘解 $x_0$，比较两者范数，验证"正则化把解拉小"。
+
+<details>
+<summary>📖 参考答案</summary>
+
+**第 1 步：正则化正规方程。** 对 $\min_x\lVert Ax-\vec b\rVert_2^2+\lambda\lVert x\rVert_2^2$ 求梯度令其为 0：$2A^\top Ax-2A^\top\vec b+2\lambda x=0$，整理得
+
+$$\boxed{(A^\top A+\lambda I)\,x=A^\top\vec b}$$
+
+$\lambda I$ 把 $A^\top A$ 的每个特征值抬高 $\lambda$，保证矩阵一定正定可逆、条件数变好，从而抑制病态与过拟合（解被"惩罚"得更小更平滑）。
+
+**第 2 步：公共部件。** 第一列全 1、第二列为 $x=(0,1,2)$：
+
+- $A^\top A=\begin{bmatrix}\sum1&\sum x\\\sum x&\sum x^2\end{bmatrix}=\begin{bmatrix}3&3\\3&5\end{bmatrix}$
+- $A^\top\vec b=\begin{bmatrix}\sum b_i\\\sum x_ib_i\end{bmatrix}=\begin{bmatrix}1+1+4\\0+1+8\end{bmatrix}=\begin{bmatrix}6\\9\end{bmatrix}$
+
+**第 3 步：$\lambda=1$ 的正则化解。** $A^\top A+I=\begin{bmatrix}4&3\\3&6\end{bmatrix}$，$\det=24-9=15$，
+
+$$x_1=\frac{1}{15}\begin{bmatrix}6&-3\\-3&4\end{bmatrix}\begin{bmatrix}6\\9\end{bmatrix}=\frac{1}{15}\begin{bmatrix}36-27\\-18+36\end{bmatrix}=\frac{1}{15}\begin{bmatrix}9\\18\end{bmatrix}=\begin{bmatrix}0.6\\1.2\end{bmatrix}$$
+
+验证：$\begin{bmatrix}4&3\\3&6\end{bmatrix}\begin{bmatrix}0.6\\1.2\end{bmatrix}=\begin{bmatrix}2.4+3.6\\1.8+7.2\end{bmatrix}=\begin{bmatrix}6\\9\end{bmatrix}$ ✓
+
+**第 4 步：$\lambda=0$ 的普通最小二乘解。** $A^\top A=\begin{bmatrix}3&3\\3&5\end{bmatrix}$，$\det=15-9=6$，
+
+$$x_0=\frac{1}{6}\begin{bmatrix}5&-3\\-3&3\end{bmatrix}\begin{bmatrix}6\\9\end{bmatrix}=\frac{1}{6}\begin{bmatrix}30-27\\-18+27\end{bmatrix}=\frac{1}{6}\begin{bmatrix}3\\9\end{bmatrix}=\begin{bmatrix}0.5\\1.5\end{bmatrix}$$
+
+验证：$\begin{bmatrix}3&3\\3&5\end{bmatrix}\begin{bmatrix}0.5\\1.5\end{bmatrix}=\begin{bmatrix}1.5+4.5\\1.5+7.5\end{bmatrix}=\begin{bmatrix}6\\9\end{bmatrix}$ ✓
+
+**第 5 步：比较范数。**
+
+$$\lVert x_0\rVert_2=\sqrt{0.5^2+1.5^2}=\sqrt{2.5}\approx1.58,\qquad \lVert x_1\rVert_2=\sqrt{0.6^2+1.2^2}=\sqrt{1.80}\approx1.34$$
+
+$\lVert x_1\rVert_2<\lVert x_0\rVert_2$：加入 $\lambda$ 后解的范数被压小，正体现了 Tikhonov 正则化"惩罚解太大"的作用；$\lambda$ 越大解越小越平滑（但与数据的拟合偏差越大）。
+
+</details>
+
+### 练习 3 · Gram 矩阵 SPD 与 Cholesky 的关系（概念题，仿真题 Q7(2)，⭐⭐，约 6 分）
+
+求解超定最小二乘最终归结为解正规方程 $A^\top Ax=A^\top b$。设 $A\in\mathbb{R}^{m\times n}$（$m>n$）列满秩。
+
+1. 证明 $G=A^\top A$ 对称且正定（SPD）。
+2. 既然 $G$ 是 SPD，解 $Gx=A^\top b$ 时为什么可以用 Cholesky 分解 $G=LL^\top$ 而不必走一般 LU？相比 LU 它省在哪里？解题分哪两步？
+3. 给定 $G=\begin{bmatrix}2&1\\1&2\end{bmatrix}$，**不做完整 Cholesky 分解**，只用判据说明它确实 SPD（因而 Cholesky 一定存在）。
+
+<details>
+<summary>📖 参考答案</summary>
+
+**第 1 问：$G=A^\top A$ 是 SPD。**
+
+- *对称*：$G^\top=(A^\top A)^\top=A^\top(A^\top)^\top=A^\top A=G$ ✓。
+- *正定*：对任意 $x\ne0$，$x^\top Gx=x^\top A^\top Ax=(Ax)^\top(Ax)=\lVert Ax\rVert_2^2\ge0$。又因 $A$ 列满秩，$x\ne0\Rightarrow Ax\ne0\Rightarrow\lVert Ax\rVert_2^2>0$。故 $x^\top Gx>0$ 对一切 $x\ne0$ 成立，$G$ 正定（从而可逆，正规方程有唯一解）。$\blacksquare$
+
+**第 2 问：为什么用 Cholesky。** SPD 矩阵必可分解成 $G=LL^\top$（$L$ 下三角，对角元为正），这是 LU 在对称正定情形下的特化版。
+
+- *省在哪*：因对称只需存 / 算一个 $L$（而非 $L,U$ 两个），约**省一半内存、省一半运算量**；且数值上无需选主元就很稳定。
+- *两步求解*：先前代解 $L\,y=A^\top b$，再回代解 $L^\top x=y$。两步都是三角方程，各 $O(n^2)$。
+
+（注：考纲对 Cholesky"不考计算、考概念"，本问只需说清 SPD→存在、省一半、两步三角求解，以及它与正规方程/QR 都是解最小二乘的不同途径即可。）
+
+**第 3 问：判定 $G=\begin{bmatrix}2&1\\1&2\end{bmatrix}$ 为 SPD。** 用 **Sylvester 判据**（所有顺序主子式 $>0$，等价于 SPD）：
+
+- 对称性：$G^\top=G$ ✓。
+- 一阶顺序主子式 $D_1=2>0$；
+- 二阶顺序主子式 $D_2=\det G=2\cdot2-1\cdot1=3>0$。
+
+两个顺序主子式都为正且对称，故 $G$ 为 SPD，Cholesky 分解 $G=LL^\top$ 必存在且唯一。（亦可算特征值 $\lambda=2\pm1=3,1$，均 $>0$，结论相同。）
+
+</details>

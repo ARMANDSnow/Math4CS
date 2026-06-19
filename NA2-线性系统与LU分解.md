@@ -2,14 +2,14 @@
 course: Math4CS
 chapter: NA2
 topic: 线性系统与 LU 分解 Linear Systems and LU Decomposition
-teacher: A · 应凯
+teacher: 应凯
 date: 2026-06-19
 tags: [Math4CS, 数值算法, 线性方程组, 高斯消元, LU分解, 三角矩阵]
 ---
 
 # NA2 线性系统与 LU 分解（Linear Systems and LU Decomposition）
 
-> 来源：A 老师 `2-LinearSystemAndLU.pptx`（教材 Solomon《Numerical Algorithms》第 2–3 章）· 考纲第 2 章
+> 来源：应凯老师 `2-LinearSystemAndLU.pptx`（教材 Solomon《Numerical Algorithms》第 2–3 章）· 考纲第 2 章
 > 一句话定位：怎么又快又稳地解线性方程组 $Ax=b$。核心招数是把矩阵拆成"两个三角矩阵相乘"（LU 分解），因为三角矩阵最好解。
 > **考纲地位：LU 分解会考计算。** 这是个手算大题候选，务必练熟整套流程。
 
@@ -24,6 +24,7 @@ tags: [Math4CS, 数值算法, 线性方程组, 高斯消元, LU分解, 三角矩
 8. 考点雷达
 9. 易错点 & 陷阱
 10. 本章速查卡
+11. 练习题（自测）
 
 ---
 
@@ -236,3 +237,127 @@ $$\boxed{x=3,\quad y=-1}$$
 **可解性**：方阵满秩→唯一解；超定（高瘦）→最小二乘；欠定（矮胖）→最小范数解。
 
 **手算口诀**：前向消元写 $U$ → 乘子变号写 $L$ → 前代解 $y$ → 回代解 $x$ → 代回验算。
+
+---
+
+## 11. 练习题（自测）
+
+> 仿期末 / 作业风格，全新设定与数字，与上文例题、原作业均不重复。建议先独立做完，再展开核对答案。
+
+### 练习 1 · LU 分解（$3\times3$ 手算 $L,U$）（仿真题 Q7，⭐⭐⭐，约 8 分）
+
+对下列矩阵做 LU 分解。要求写出前向消元各步的乘子，给出下三角 $L$（对角线全 1）与上三角 $U$，并验证 $LU=A$。
+
+$$A=\begin{pmatrix}2&-1&1\\4&1&4\\-2&10&9\end{pmatrix}$$
+
+<details>
+<summary>📖 参考答案</summary>
+
+**第 1 步：用第 1 行消去第 1 列下方两元。** 主元 $a_{11}=2$。
+
+乘子 $m_{21}=\dfrac{a_{21}}{a_{11}}=\dfrac{4}{2}=2$，$m_{31}=\dfrac{a_{31}}{a_{11}}=\dfrac{-2}{2}=-1$。
+
+- 第 2 行 $-\,2\times$第 1 行：$[\,4-4,\;1-(-2),\;4-2\,]=[\,0,\;3,\;2\,]$
+- 第 3 行 $-(-1)\times$第 1 行（即第 3 行 $+$第 1 行）：$[\,-2+2,\;10+(-1),\;9+1\,]=[\,0,\;9,\;10\,]$
+
+得中间矩阵
+
+$$\begin{pmatrix}2&-1&1\\0&3&2\\0&9&10\end{pmatrix}$$
+
+**第 2 步：用新第 2 行消去第 2 列下方。** 主元为 $3$。
+
+乘子 $m_{32}=\dfrac{9}{3}=3$。第 3 行 $-\,3\times$第 2 行：$[\,0,\;9-9,\;10-6\,]=[\,0,\;0,\;4\,]$。得
+
+$$U=\begin{pmatrix}2&-1&1\\0&3&2\\0&0&4\end{pmatrix}$$
+
+**第 3 步：把乘子对号入座填进 $L$**（$L$ 对角线全 1，位置 $(i,j)$ 填 $m_{ij}$）：
+
+$$L=\begin{pmatrix}1&0&0\\2&1&0\\-1&3&1\end{pmatrix}$$
+
+**验证 $LU=A$**：
+
+$$\begin{pmatrix}1&0&0\\2&1&0\\-1&3&1\end{pmatrix}\begin{pmatrix}2&-1&1\\0&3&2\\0&0&4\end{pmatrix}=\begin{pmatrix}2&-1&1\\4&-2+3&2+2\\-2&1+9&-1+6+4\end{pmatrix}=\begin{pmatrix}2&-1&1\\4&1&4\\-2&10&9\end{pmatrix}=A\;\checkmark$$
+
+</details>
+
+### 练习 2 · 用 LU 解方程组（前代 + 回代）（仿 HW4.2，⭐⭐，约 7 分）
+
+已知某矩阵 $A$ 的 LU 分解为
+
+$$L=\begin{pmatrix}1&0&0\\3&1&0\\2&-1&1\end{pmatrix},\qquad U=\begin{pmatrix}1&2&-1\\0&-3&5\\0&0&2\end{pmatrix}$$
+
+利用该分解（不要重新消元）求解 $Ax=b$，其中 $b=\begin{pmatrix}1\\1\\2\end{pmatrix}$。请分别写出前代得到的中间量 $y$ 与回代得到的最终解 $x$。
+
+<details>
+<summary>📖 参考答案</summary>
+
+$Ax=b\Rightarrow LUx=b$。令 $y=Ux$，分两步三角求解。
+
+**第 1 步：前代 $Ly=b$（从上往下，$L$ 对角线全 1）。**
+
+$$\begin{pmatrix}1&0&0\\3&1&0\\2&-1&1\end{pmatrix}\begin{pmatrix}y_1\\y_2\\y_3\end{pmatrix}=\begin{pmatrix}1\\1\\2\end{pmatrix}$$
+
+- $y_1=1$
+- $3y_1+y_2=1\Rightarrow y_2=1-3=-2$
+- $2y_1-y_2+y_3=2\Rightarrow 2-(-2)+y_3=2\Rightarrow y_3=2-4=-2$
+
+$$y=\begin{pmatrix}1\\-2\\-2\end{pmatrix}$$
+
+**第 2 步：回代 $Ux=y$（从下往上）。**
+
+$$\begin{pmatrix}1&2&-1\\0&-3&5\\0&0&2\end{pmatrix}\begin{pmatrix}x_1\\x_2\\x_3\end{pmatrix}=\begin{pmatrix}1\\-2\\-2\end{pmatrix}$$
+
+- $2x_3=-2\Rightarrow x_3=-1$
+- $-3x_2+5x_3=-2\Rightarrow -3x_2-5=-2\Rightarrow -3x_2=3\Rightarrow x_2=-1$
+- $x_1+2x_2-x_3=1\Rightarrow x_1-2+1=1\Rightarrow x_1=2$
+
+$$\boxed{x=\begin{pmatrix}2\\-1\\-1\end{pmatrix}}$$
+
+**验算**：可先算出 $A=LU=\begin{pmatrix}1&2&-1\\3&3&2\\2&7&-5\end{pmatrix}$，则
+
+$$Ax=\begin{pmatrix}1&2&-1\\3&3&2\\2&7&-5\end{pmatrix}\begin{pmatrix}2\\-1\\-1\end{pmatrix}=\begin{pmatrix}2-2+1\\6-3-2\\4-7+5\end{pmatrix}=\begin{pmatrix}1\\1\\2\end{pmatrix}=b\;\checkmark$$
+
+</details>
+
+### 练习 3 · 高斯消元与选主元（pivoting）（仿真题 Q7 概念延伸，⭐⭐，约 6 分）
+
+对下列矩阵做前向消元：
+
+$$A=\begin{pmatrix}2&1&-1\\4&2&3\\-2&3&1\end{pmatrix}$$
+
+(1) 消去第 1 列下方两元后，观察第 2 个主元（$(2,2)$ 位置）出现什么问题？
+(2) 该怎么处理才能继续消元？请写出对应的置换矩阵 $P$，并完成消元得到上三角 $U$。
+(3) 这个 $A$ 是否可逆（即 $Ax=b$ 是否有唯一解）？请用 $\det A$ 说明，并指出"主元出现 0"是否就等于"矩阵不可逆"。
+
+<details>
+<summary>📖 参考答案</summary>
+
+**(1) 第 1 列消元。** 主元 $a_{11}=2$，乘子 $m_{21}=\dfrac{4}{2}=2$，$m_{31}=\dfrac{-2}{2}=-1$。
+
+- 第 2 行 $-\,2\times$第 1 行：$[\,0,\;2-2,\;3+2\,]=[\,0,\;0,\;5\,]$
+- 第 3 行 $+$第 1 行：$[\,0,\;3+1,\;1-1\,]=[\,0,\;4,\;0\,]$
+
+$$\begin{pmatrix}2&1&-1\\0&\mathbf{0}&5\\0&4&0\end{pmatrix}$$
+
+**问题**：第 2 个主元 $(2,2)=0$，无法用它作除数继续消元（会除以 0）。
+
+**(2) 处理：选主元（pivoting）——把下方非零行换上来。** 第 3 行的 $(3,2)=4\neq0$，故交换第 2、3 行，对应置换矩阵
+
+$$P=\begin{pmatrix}1&0&0\\0&0&1\\0&1&0\end{pmatrix}$$
+
+换行后矩阵已是上三角（$(3,2)$ 位置恰为 0，$m_{32}=0$ 无需再消）：
+
+$$U=\begin{pmatrix}2&1&-1\\0&4&0\\0&0&5\end{pmatrix}$$
+
+（即得到带选主元的分解 $PA=LU$，其中 $L=\begin{pmatrix}1&0&0\\-1&1&0\\2&0&1\end{pmatrix}$，可自行验证 $LU=PA$。）
+
+**(3) 可逆性。** 沿第 1 列展开：
+
+$$\det A=2\,(2\cdot1-3\cdot3)-1\,(4\cdot1-3\cdot(-2))+(-1)\,(4\cdot3-2\cdot(-2))$$
+$$=2(2-9)-1(4+6)-1(12+4)=2(-7)-10-16=-14-10-16=-40\neq0$$
+
+所以 $A$ 可逆，$Ax=b$ 有唯一解。
+
+**结论**：消元中"某个主元变成 0"**并不**意味着矩阵不可逆——本题 $\det A=-40\neq0$ 却出现了零主元。它只说明当前行顺序不适合直接消元，换行（选主元）后即可正常进行。真正不可逆的标志是消元到底后 $U$ 的对角线出现 0（即主元乘积 $=0$）。本题 $U$ 对角线为 $2,4,5$，乘积 $40$，与 $|\det A|$ 一致。
+
+</details>

@@ -2,14 +2,14 @@
 course: Math4CS
 chapter: NA6
 topic: 特征值问题 Eigenproblems
-teacher: A · 应凯
+teacher: 应凯
 date: 2026-06-19
 tags: [Math4CS, 数值算法, 特征值, 特征向量, 谱定理, 幂迭代, PCA]
 ---
 
 # NA6 特征值问题（Eigenproblems）
 
-> 来源：A 老师 `6-eigen.pptx`（教材 Solomon 第 6 章）· 考纲第 6 章
+> 来源：应凯老师 `6-eigen.pptx`（教材 Solomon 第 6 章）· 考纲第 6 章
 > 一句话定位：找矩阵的"本征方向"——被矩阵作用后只缩放、不转向的那些向量（特征向量）及其缩放倍数（特征值）。它是 PCA、主成分分析、SVD 的地基。
 > **考纲地位：Power Iteration 不考计算，但概念会考。** 重点是定义、性质、谱定理，以及"幂迭代何时不收敛"这类概念题。
 
@@ -25,6 +25,7 @@ tags: [Math4CS, 数值算法, 特征值, 特征向量, 谱定理, 幂迭代, PCA
 9. 考点雷达
 10. 易错点 & 陷阱
 11. 本章速查卡
+12. 练习题（自测）
 
 ---
 
@@ -212,3 +213,76 @@ $$Au=(uv^\top)u=u(v^\top u)=(u^\top v)\,u=1\cdot u=u$$
 **逆迭代**：对 $A^{-1}$（或 $A-\sigma I$）幂迭代 → 抓最小（或离 $\sigma$ 最近）特征值。
 
 **秩 1 $uv^\top$**：特征值 $\{u^\top v,0,\dots,0\}$，1 步收敛。
+
+---
+
+## 12. 练习题（自测）
+
+> 仿期末 / 作业风格，全新设定与数字，与上文例题、原作业均不重复。建议先独立做完，再展开核对答案。
+
+### 练习 1 · 2×2 特征值与特征向量（仿期末手算题，⭐⭐，约 8 分）
+
+> **题**：设 $A=\begin{pmatrix}3 & 1\\ 2 & 2\end{pmatrix}$。
+> (a) 写出特征多项式并求出全部特征值。
+> (b) 求每个特征值对应的一个特征向量。
+> (c) 若对 $A$ 做幂迭代，会收敛到哪个特征值对应的方向？给出此时的收敛率 $|\lambda_2/\lambda_1|$。
+
+<details>
+<summary>📖 参考答案</summary>
+
+**(a) 特征多项式与特征值。**
+
+$$\det(A-\lambda I)=\det\begin{pmatrix}3-\lambda & 1\\ 2 & 2-\lambda\end{pmatrix}=(3-\lambda)(2-\lambda)-1\cdot 2$$
+
+展开：$(3-\lambda)(2-\lambda)=\lambda^2-5\lambda+6$，再减去 $2$：
+
+$$\lambda^2-5\lambda+4=(\lambda-1)(\lambda-4)=0$$
+
+所以特征值为 $\boxed{\lambda_1=4,\ \lambda_2=1}$。
+
+> 验算（性质核对）：迹 $\operatorname{tr}(A)=3+2=5=4+1$ ✓；行列式 $\det(A)=3\cdot 2-1\cdot 2=4=4\cdot 1$ ✓。
+
+**(b) 特征向量。**
+
+- $\lambda=4$：解 $(A-4I)v=0$，即 $\begin{pmatrix}-1 & 1\\ 2 & -2\end{pmatrix}v=0$。两行都给出 $v_1=v_2$，取 $v^{(1)}=\begin{pmatrix}1\\ 1\end{pmatrix}$。
+ 验算：$Av^{(1)}=\begin{pmatrix}3+1\\ 2+2\end{pmatrix}=\begin{pmatrix}4\\ 4\end{pmatrix}=4\begin{pmatrix}1\\ 1\end{pmatrix}$ ✓。
+
+- $\lambda=1$：解 $(A-I)v=0$，即 $\begin{pmatrix}2 & 1\\ 2 & 1\end{pmatrix}v=0$。两行都给出 $2v_1+v_2=0$，取 $v^{(2)}=\begin{pmatrix}1\\ -2\end{pmatrix}$。
+ 验算：$Av^{(2)}=\begin{pmatrix}3-2\\ 2-4\end{pmatrix}=\begin{pmatrix}1\\ -2\end{pmatrix}=1\cdot\begin{pmatrix}1\\ -2\end{pmatrix}$ ✓。
+
+**(c) 幂迭代方向与收敛率。**
+
+幂迭代锁定**最大模**特征值。这里 $|\lambda_1|=4>|\lambda_2|=1$，主特征值唯一，故收敛到 $\lambda=4$ 对应的方向 $\begin{pmatrix}1\\ 1\end{pmatrix}$。
+
+收敛率 $\left|\dfrac{\lambda_2}{\lambda_1}\right|=\left|\dfrac{1}{4}\right|=\dfrac14$（比值小，收敛较快）。
+
+</details>
+
+### 练习 2 · 谱定理与幂迭代概念（仿期末概念题，⭐⭐，约 6 分）
+
+> **题**：判断 (a)(b) 两个命题的真假并说明理由；(c)(d) 简答。
+> (a) 任意实方阵 $A$ 都能写成 $A=Q\Lambda Q^\top$（$Q$ 正交、$\Lambda$ 对角）。
+> (b) 实对称矩阵的特征值一定是实数。
+> (c) 已知某 $3\times 3$ 矩阵 $A$ 的全部特征值为 $\{-7,\ 4,\ 2\}$。对 $A$ 做幂迭代会收敛到哪个特征值对应的方向？收敛率约为多少？
+> (d) 在 (c) 的条件下，求 $\operatorname{tr}(A)$ 与 $\det(A)$。
+
+<details>
+<summary>📖 参考答案</summary>
+
+**(a) 假。** 正交对角化 $A=Q\Lambda Q^\top$ 是**谱定理**的结论，只对**实对称矩阵**（$A=A^\top$，复数情形为 Hermitian）成立。一般实方阵的特征值可能是复数、特征向量也未必正交，不能保证存在正交的 $Q$ 把它对角化（甚至未必可对角化）。
+
+**(b) 真。** 这正是谱定理的第一条：实对称矩阵的所有特征值都是实数（且不同特征值的特征向量互相正交）。
+
+**(c) 收敛到 $\lambda=-7$ 对应的方向。** 幂迭代锁定的是**绝对值（模）最大**的特征值，不是代数值最大的那个。三个特征值的模为 $|-7|=7,\ |4|=4,\ |2|=2$，最大模是 $7$（对应 $\lambda=-7$），且唯一，故幂迭代收敛到它的特征向量方向。
+
+收敛率取决于"第二大模 / 最大模"：
+
+$$\left|\frac{\lambda_2}{\lambda_1}\right|=\frac{4}{7}\approx 0.571$$
+
+（注意：尽管 $4>2$ 是正数、$-7$ 是负数，主导者仍是 $-7$；这是常见陷阱。）
+
+**(d) 用迹=特征值之和、行列式=特征值之积：**
+
+$$\operatorname{tr}(A)=\sum_i\lambda_i=-7+4+2=-1,\qquad \det(A)=\prod_i\lambda_i=(-7)\cdot 4\cdot 2=-56.$$
+
+</details>

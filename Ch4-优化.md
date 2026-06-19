@@ -42,6 +42,7 @@ tags: [Math4CS, 优化, 凸优化, 线性规划, 二次规划, 梯度下降, 牛
 - [[#24. 全章学习主线|24 · 全章学习主线]]
 - [[#25. 考点 / 作业最可能考的 10 件事|25 · 考点 / 作业 Top 10]]
 - [[#26. 习题精解（HW3 最后两题）|26 · 习题精解（HW3 最后两题）]]
+- [[#27. 练习题（自测）|27 · 练习题（自测）]]
 
 > 💡 在 Obsidian 中按 `Cmd+Opt+L` 调出右侧大纲面板，可以看到所有三级标题。
 
@@ -1293,3 +1294,154 @@ $$x_{t+1} = \begin{bmatrix} x_1 - \eta(2 x_1 + 2) \\ x_2 - 4 \eta x_2 \end{bmatr
 - [ ] L-BFGS（拟牛顿法，不用算 Hessian）
 - [ ] SDP 半定规划（Max-Cut 的松弛求解）
 - [ ] ADMM / Proximal 方法（大规模优化 / 分布式）
+
+---
+
+## 27. 练习题（自测）
+
+> 仿期末 / 作业风格，全新设定与数字，与上文例题、原作业均不重复。建议先独立做完，再展开核对答案。
+
+### 练习 1 · 优化问题分类（仿真题 Q5 第一问，⭐，约 4 分）
+
+判断下列四个优化问题各属于 **LP / QP / QCQP / GP** 中的哪一类，并简要说明依据（目标与约束分别是什么形状、是否满足该类的关键条件）。
+
+**(a)**
+$$\min_{x}\ 3x_1 - 2x_2 + x_3 \quad \text{s.t. } x_1 + x_2 \le 4,\ x_2 - x_3 = 1,\ x \ge 0$$
+
+**(b)**
+$$\min_{x}\ x_1^2 + 4x_2^2 - 2x_1 x_2 + x_1 \quad \text{s.t. } x_1 + x_2 \le 3$$
+
+**(c)**
+$$\min_{x}\ 2x_1 + x_2 \quad \text{s.t. } x_1^2 + x_2^2 \le 5,\ x_1 + x_2 \le 2$$
+
+**(d)**
+$$\min_{x}\ x_1^{-1} x_2^{-1} + 3 x_2 x_3^2 \quad \text{s.t. } x_1^2 x_3 \le 2,\ x_1, x_2, x_3 > 0$$
+
+<details>
+<summary>📖 参考答案</summary>
+
+判别口诀（对照 [[#24. 全章学习主线|学习主线表]]）：
+- **LP**：目标线性 + 约束线性。
+- **QP**：目标凸二次（$\tfrac12 x^\top P x + q^\top x$，$P \succeq 0$）+ 约束**线性**。
+- **QCQP**：目标凸二次 + 至少一条**二次**约束（$P_i \succeq 0$）。
+- **GP**：目标是 posynomial（若干单项式之和，系数 $\ge 0$，指数任意实数）+ 约束是 posynomial $\le$ 常数 / monomial 等式，且 $x > 0$。
+
+**(a) LP。** 目标 $3x_1 - 2x_2 + x_3 = c^\top x$ 线性；约束 $x_1+x_2\le 4$、$x_2-x_3=1$、$x\ge0$ 全是线性（不）等式。线性目标 + 线性约束 $\Rightarrow$ **线性规划**。
+
+**(b) 凸 QP。** 约束 $x_1+x_2\le3$ 线性；目标含二次项 $x_1^2+4x_2^2-2x_1x_2$，写成 $\tfrac12 x^\top P x + q^\top x$ 形式：
+
+$$\tfrac12 x^\top P x = x_1^2 + 4x_2^2 - 2x_1 x_2 \ \Longrightarrow\ P = \begin{bmatrix} 2 & -2 \\ -2 & 8 \end{bmatrix},\quad q = \begin{bmatrix}1\\0\end{bmatrix}$$
+
+（核对：$\tfrac12 x^\top P x = \tfrac12(2x_1^2 + 8x_2^2 - 4x_1x_2) = x_1^2 + 4x_2^2 - 2x_1x_2$ ✓。）
+
+判断 $P \succeq 0$：$P$ 对称，$\det P = 2\cdot 8 - (-2)^2 = 16 - 4 = 12 > 0$，且 $P_{11} = 2 > 0$，故 $P \succ 0$（正定）。二次凸目标 + 线性约束 $\Rightarrow$ **凸二次规划 QP**。
+
+**(c) 凸 QCQP。** 目标 $2x_1+x_2$ 线性（可视为 $P_0 = 0$ 的退化二次）；约束里 $x_1^2 + x_2^2 \le 5$ 是**二次约束**，对应 $P_1 = 2I \succeq 0$（可行域为一个圆盘），另一条 $x_1+x_2\le2$ 是线性约束。出现凸二次约束 $\Rightarrow$ **凸 QCQP**（注意：因为它含二次约束，不能归为 LP/QP）。
+
+**(d) GP。** 目标 $x_1^{-1}x_2^{-1} + 3x_2 x_3^2$ 是两个单项式之和（系数 $1\ge0$、$3\ge0$，指数任意实数）$\Rightarrow$ posynomial；约束 $x_1^2 x_3 \le 2$ 左边是单项式（monomial $\le$ 正常数），且 $x>0$。符合 $\min$ posynomial s.t. posynomial $\le b$、$x\succ0$ 的标准形 $\Rightarrow$ **几何规划 GP**（取 $\log$ 后可化为凸问题，见 [[#9. 几何规划 GP|第 9 节]]）。
+
+| 小题 | 类别 | 关键依据 |
+|---|---|---|
+| (a) | **LP** | 线性目标 + 线性约束 |
+| (b) | **QP** | 凸二次目标（$P\succ0$）+ 线性约束 |
+| (c) | **QCQP** | 线性目标 + 二次约束 $x_1^2+x_2^2\le5$ |
+| (d) | **GP** | posynomial 目标 + monomial 约束 + $x>0$ |
+
+</details>
+
+### 练习 2 · Lagrange 对偶（仿真题 Q5 第二问，⭐⭐，约 4 分）
+
+考虑带等式约束的凸优化问题：
+
+$$\min_{x \in \mathbb{R}^2}\ \tfrac12\left(x_1^2 + x_2^2\right) \quad \text{s.t. } x_1 + x_2 = 4$$
+
+1. 写出 Lagrange 函数 $L(x, \nu)$。
+2. 对 $x$ 求极小，得到对偶函数 $g(\nu)$。
+3. 写出并求解对偶问题 $\max_\nu g(\nu)$，给出对偶最优值 $d^\star$。
+4. 直接求原问题最优值 $p^\star$，验证是否满足强对偶 $p^\star = d^\star$。
+
+<details>
+<summary>📖 参考答案</summary>
+
+**第 1 步：Lagrange 函数。** 等式约束写成 $x_1 + x_2 - 4 = 0$，乘子记为 $\nu$（等式约束的乘子无符号限制）：
+
+$$L(x, \nu) = \tfrac12\left(x_1^2 + x_2^2\right) + \nu\left(x_1 + x_2 - 4\right)$$
+
+**第 2 步：求对偶函数 $g(\nu) = \inf_x L(x,\nu)$。** $L$ 对 $x$ 是凸二次（每个 $x_i$ 系数 $\tfrac12 > 0$），令梯度为 0：
+
+$$\frac{\partial L}{\partial x_1} = x_1 + \nu = 0 \ \Rightarrow\ x_1 = -\nu, \qquad \frac{\partial L}{\partial x_2} = x_2 + \nu = 0 \ \Rightarrow\ x_2 = -\nu$$
+
+回代：
+
+$$g(\nu) = \tfrac12\left(\nu^2 + \nu^2\right) + \nu\left(-\nu - \nu - 4\right) = \nu^2 + \nu(-2\nu - 4) = \nu^2 - 2\nu^2 - 4\nu = -\nu^2 - 4\nu$$
+
+**第 3 步：对偶问题。** $g(\nu) = -\nu^2 - 4\nu$ 是关于 $\nu$ 的凹二次（无约束，因为是等式约束）：
+
+$$\max_{\nu \in \mathbb{R}}\ \left(-\nu^2 - 4\nu\right)$$
+
+令 $g'(\nu) = -2\nu - 4 = 0 \Rightarrow \nu^\star = -2$。代回：
+
+$$d^\star = g(-2) = -(-2)^2 - 4(-2) = -4 + 8 = 4$$
+
+**第 4 步：验证强对偶。** 直接解原问题：由对称性 / 拉格朗日驻点知最优在 $x_1^\star = x_2^\star = -\nu^\star = 2$，核对约束 $2 + 2 = 4$ ✓。代入目标：
+
+$$p^\star = \tfrac12\left(2^2 + 2^2\right) = \tfrac12 \cdot 8 = 4$$
+
+于是 $p^\star = d^\star = 4$。该问题目标凸、约束为仿射，**Slater 条件满足**，强对偶成立，与计算结果一致 ✓。
+
+> 一句话回顾：对偶函数 $g(\nu)$ 是把约束"折价塞进目标"后对 $x$ 取下确界得到的下界函数；对偶问题就是把这个下界顶到最高。凸 + 仿射约束时，最高下界恰好等于原最优值。
+
+</details>
+
+### 练习 3 · KKT 条件求解（仿真题 Q3 判断 + KKT，⭐⭐，约 5 分）
+
+考虑带一条不等式约束的二次规划：
+
+$$\min_{x \in \mathbb{R}^2}\ \tfrac12\left(x_1^2 + x_2^2\right) - 2x_1 - x_2 \quad \text{s.t. } x_1 + x_2 \le 2$$
+
+1. 先求**无约束**最优点，判断约束在该点是否被违反，从而判断不等式约束在最优解处是否**起作用（active）**。
+2. 写出 KKT 条件（含平稳性、原始可行、对偶可行、互补松弛），求出最优解 $x^\star$、乘子 $\mu^\star$ 与最优值 $f^\star$。
+
+<details>
+<summary>📖 参考答案</summary>
+
+**第 1 步：先看无约束最优。** 目标 $f(x) = \tfrac12(x_1^2 + x_2^2) - 2x_1 - x_2$，梯度
+
+$$\nabla f(x) = \begin{bmatrix} x_1 - 2 \\ x_2 - 1 \end{bmatrix}$$
+
+令 $\nabla f = 0$ 得无约束最优 $\hat x = (2,\ 1)$。代入约束：$2 + 1 = 3 > 2$，**违反**约束。所以真正的最优解被约束"拉回"到边界上，不等式约束在最优处 **active（取等号）**，对应乘子 $\mu^\star > 0$。
+
+**第 2 步：列 KKT 条件。** 约束写成 $g(x) = x_1 + x_2 - 2 \le 0$，Lagrange 函数
+
+$$L(x, \mu) = \tfrac12(x_1^2 + x_2^2) - 2x_1 - x_2 + \mu\,(x_1 + x_2 - 2)$$
+
+KKT 四条：
+
+$$\text{(平稳性)}\quad \nabla_x L = \begin{bmatrix} x_1 - 2 + \mu \\ x_2 - 1 + \mu \end{bmatrix} = 0$$
+$$\text{(原始可行)}\quad x_1 + x_2 - 2 \le 0$$
+$$\text{(对偶可行)}\quad \mu \ge 0$$
+$$\text{(互补松弛)}\quad \mu\,(x_1 + x_2 - 2) = 0$$
+
+由平稳性：$x_1 = 2 - \mu,\ x_2 = 1 - \mu$。第 1 步已判断约束 active，即 $x_1 + x_2 = 2$，代入：
+
+$$(2 - \mu) + (1 - \mu) = 2 \ \Longrightarrow\ 3 - 2\mu = 2 \ \Longrightarrow\ \mu^\star = \tfrac12$$
+
+回代得
+
+$$x_1^\star = 2 - \tfrac12 = \tfrac32, \qquad x_2^\star = 1 - \tfrac12 = \tfrac12$$
+
+**逐条验证 KKT：**
+- 对偶可行：$\mu^\star = \tfrac12 > 0$ ✓
+- 原始可行：$x_1^\star + x_2^\star = \tfrac32 + \tfrac12 = 2 \le 2$ ✓
+- 互补松弛：$\mu^\star(x_1^\star+x_2^\star-2) = \tfrac12 \cdot 0 = 0$ ✓
+- 平稳性核对：$\nabla f(x^\star) = (\tfrac32 - 2,\ \tfrac12 - 1) = (-\tfrac12, -\tfrac12)$，约束梯度 $\nabla g = (1,1)$，则 $\nabla f + \mu^\star \nabla g = (-\tfrac12 + \tfrac12,\ -\tfrac12 + \tfrac12) = (0,0)$ ✓
+
+**最优值：**
+
+$$f^\star = \tfrac12\left(\left(\tfrac32\right)^2 + \left(\tfrac12\right)^2\right) - 2\cdot\tfrac32 - \tfrac12 = \tfrac12\left(\tfrac94 + \tfrac14\right) - 3 - \tfrac12 = \tfrac12\cdot\tfrac{10}{4} - \tfrac72 = \tfrac54 - \tfrac{14}{4} = -\tfrac94$$
+
+$$\boxed{x^\star = \left(\tfrac32,\ \tfrac12\right),\quad \mu^\star = \tfrac12,\quad f^\star = -\tfrac94}$$
+
+> 目标 Hessian 为 $I \succ 0$、约束线性，问题是凸 QP，满足 KKT 即为全局最优。判断"约束是否 active"是这类题的关键第一步：若无约束最优已在可行域内，则 $\mu^\star = 0$、约束失效，最优解就是无约束解；本题无约束解越界，故约束取等号、$\mu^\star > 0$。
+
+</details>

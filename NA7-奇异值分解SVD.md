@@ -2,14 +2,14 @@
 course: Math4CS
 chapter: NA7
 topic: 奇异值分解 Singular Value Decomposition
-teacher: A · 应凯
+teacher: 应凯
 date: 2026-06-19
 tags: [Math4CS, 数值算法, SVD, 奇异值, 伪逆, 低秩近似, EckartYoung, 正则化]
 ---
 
 # NA7 奇异值分解（Singular Value Decomposition, SVD）
 
-> 来源：A 老师 `7-svd.pptx`（教材 Solomon 第 7 章）· 考纲第 7 章
+> 来源：应凯老师 `7-svd.pptx`（教材 Solomon 第 7 章）· 考纲第 7 章
 > 一句话定位：SVD 是"万能分解"——**任意**矩阵都能拆成"旋转 → 沿轴拉伸 → 旋转"。它统一了最小二乘、伪逆、低秩压缩、条件数、正则化，是整门数值课的集大成。
 > **考纲地位：SVD 会考计算。** 旧真题 Q7(3) 6 分考"三矩阵的大小/性质 + 几何意义"。
 
@@ -27,6 +27,7 @@ tags: [Math4CS, 数值算法, SVD, 奇异值, 伪逆, 低秩近似, EckartYoung,
 11. 考点雷达
 12. 易错点 & 陷阱
 13. 本章速查卡
+14. 练习题（自测）
 
 ---
 
@@ -234,3 +235,144 @@ $$U=\frac{1}{\sqrt{34}}\begin{bmatrix}-5&3\\3&5\end{bmatrix},\quad \Sigma=\begin
 **范数**：$\|A\|_2=\sigma_1$，$\|A\|_F=\sqrt{\sum\sigma_i^2}$，$\kappa_2=\sigma_{\max}/\sigma_{\min}$。
 
 **Tikhonov（SVD 视角）**：$x=\sum_i\dfrac{\sigma_i}{\sigma_i^2+\lambda}(u_i^\top b)v_i$，小奇异值被压制 → 更稳。
+
+---
+
+## 14. 练习题（自测）
+
+> 仿期末 / 作业风格，全新设定与数字，与上文例题、原作业均不重复。建议先独立做完，再展开核对答案。
+
+### 练习 1 · 求 2×2 矩阵的完整 SVD（仿真题 Q7(1ii)，⭐⭐⭐，约 8 分）
+
+对矩阵
+
+$$A=\begin{bmatrix}2&3\\0&2\end{bmatrix}$$
+
+求它的奇异值分解 $A=U\Sigma V^\top$，写出 $U,\Sigma,V$ 三个矩阵的具体数值，并验证 $U,V$ 列正交。
+
+<details>
+<summary>📖 参考答案</summary>
+
+**第 1 步：算 $A^\top A$**
+
+$$A^\top A=\begin{bmatrix}2&0\\3&2\end{bmatrix}\begin{bmatrix}2&3\\0&2\end{bmatrix}=\begin{bmatrix}4&6\\6&13\end{bmatrix}$$
+
+**第 2 步：特征值 → 奇异值**
+
+特征方程 $\det(A^\top A-\lambda I)=0$：
+
+$$(4-\lambda)(13-\lambda)-36=\lambda^2-17\lambda+16=(\lambda-16)(\lambda-1)=0$$
+
+得 $\lambda_1=16,\ \lambda_2=1$，故奇异值（开方、降序）
+
+$$\sigma_1=\sqrt{16}=4,\qquad \sigma_2=\sqrt1=1,\qquad \Sigma=\begin{bmatrix}4&0\\0&1\end{bmatrix}$$
+
+**第 3 步：右奇异向量 $V$（$A^\top A$ 的特征向量）**
+
+- $\lambda_1=16$：解 $(A^\top A-16I)v=0$，即 $\begin{bmatrix}-12&6\\6&-3\end{bmatrix}v=0\Rightarrow -12x+6y=0\Rightarrow y=2x$，取 $v_1=\dfrac1{\sqrt5}\begin{bmatrix}1\\2\end{bmatrix}$。
+- $\lambda_2=1$：解 $\begin{bmatrix}3&6\\6&12\end{bmatrix}v=0\Rightarrow x=-2y$，取 $v_2=\dfrac1{\sqrt5}\begin{bmatrix}-2\\1\end{bmatrix}$（与 $v_1$ 正交 ✓）。
+
+$$V=\frac1{\sqrt5}\begin{bmatrix}1&-2\\2&1\end{bmatrix}$$
+
+**第 4 步：左奇异向量 $U$（$u_i=Av_i/\sigma_i$）**
+
+$$u_1=\frac1{4}A v_1=\frac1{4}\cdot\frac1{\sqrt5}\begin{bmatrix}2\cdot1+3\cdot2\\0+2\cdot2\end{bmatrix}=\frac1{4\sqrt5}\begin{bmatrix}8\\4\end{bmatrix}=\frac1{\sqrt5}\begin{bmatrix}2\\1\end{bmatrix}$$
+
+$$u_2=\frac1{1}Av_2=\frac1{\sqrt5}\begin{bmatrix}2\cdot(-2)+3\cdot1\\0+2\cdot1\end{bmatrix}=\frac1{\sqrt5}\begin{bmatrix}-1\\2\end{bmatrix}$$
+
+$$U=\frac1{\sqrt5}\begin{bmatrix}2&-1\\1&2\end{bmatrix}$$
+
+**验证**：$U$ 两列点积 $\frac1{5}(2\cdot(-1)+1\cdot2)=0$，各列模长 $\frac1{\sqrt5}\sqrt{4+1}=1$，故 $U$ 正交；同理 $V$ 正交。回代
+
+$$U\Sigma V^\top=\frac1{\sqrt5}\begin{bmatrix}2&-1\\1&2\end{bmatrix}\begin{bmatrix}4&0\\0&1\end{bmatrix}\frac1{\sqrt5}\begin{bmatrix}1&2\\-2&1\end{bmatrix}=\begin{bmatrix}2&3\\0&2\end{bmatrix}=A\ ✓$$
+
+（注：奇异向量整体变号也对，只要 $U,V$ 正交、$\Sigma$ 降序、$U\Sigma V^\top=A$。）
+
+</details>
+
+### 练习 2 · 用 SVD 求 Moore-Penrose 伪逆并解最小二乘（仿作业/真题 Q7(1ii)，⭐⭐⭐，约 9 分）
+
+设秩亏的矩阵
+
+$$A=\begin{bmatrix}2&4\\1&2\end{bmatrix}$$
+
+（1）求 $A$ 的奇异值与伪逆 $A^+=V\Sigma^+U^\top$；（2）用 $x=A^+b$ 求 $\min_x\|Ax-b\|_2$ 的最小范数解，其中 $b=\begin{bmatrix}10\\5\end{bmatrix}$。
+
+<details>
+<summary>📖 参考答案</summary>
+
+**第 1 步：算 $A^\top A$ 与奇异值**
+
+$$A^\top A=\begin{bmatrix}2&1\\4&2\end{bmatrix}\begin{bmatrix}2&4\\1&2\end{bmatrix}=\begin{bmatrix}5&10\\10&20\end{bmatrix}$$
+
+特征方程 $(5-\lambda)(20-\lambda)-100=\lambda^2-25\lambda=\lambda(\lambda-25)=0$，得 $\lambda_1=25,\ \lambda_2=0$。
+
+故 $\sigma_1=\sqrt{25}=5,\ \sigma_2=0$——只有 1 个非零奇异值，$\operatorname{rank}(A)=1$（注意 $A$ 两行成比例，第 1 行 = 2×第 2 行，本就秩 1）。
+
+**第 2 步：奇异向量**
+
+- $\lambda_1=25$：$\begin{bmatrix}-20&10\\10&-5\end{bmatrix}v=0\Rightarrow y=2x$，$v_1=\dfrac1{\sqrt5}\begin{bmatrix}1\\2\end{bmatrix}$；正交补 $v_2=\dfrac1{\sqrt5}\begin{bmatrix}-2\\1\end{bmatrix}$。
+- $u_1=\dfrac1{\sigma_1}Av_1=\dfrac1{5}\cdot\dfrac1{\sqrt5}\begin{bmatrix}2+8\\1+4\end{bmatrix}=\dfrac1{5\sqrt5}\begin{bmatrix}10\\5\end{bmatrix}=\dfrac1{\sqrt5}\begin{bmatrix}2\\1\end{bmatrix}$。
+
+**第 3 步：伪逆 $A^+=V\Sigma^+U^\top$**
+
+$\Sigma^+$ 把非零奇异值取倒数：只有 $1/\sigma_1=1/5$ 一项，故伪逆只剩该秩 1 外积：
+
+$$A^+=\frac1{\sigma_1}v_1u_1^\top=\frac1{5}\cdot\frac1{\sqrt5}\begin{bmatrix}1\\2\end{bmatrix}\cdot\frac1{\sqrt5}\begin{bmatrix}2&1\end{bmatrix}=\frac1{25}\begin{bmatrix}1\\2\end{bmatrix}\begin{bmatrix}2&1\end{bmatrix}=\frac1{25}\begin{bmatrix}2&1\\4&2\end{bmatrix}$$
+
+**验证**（Moore-Penrose 条件 $AA^+A=A$）：
+
+$$A^+A=\frac1{25}\begin{bmatrix}2&1\\4&2\end{bmatrix}\begin{bmatrix}2&4\\1&2\end{bmatrix}=\frac1{25}\begin{bmatrix}5&10\\10&20\end{bmatrix}=\frac15\begin{bmatrix}1&2\\2&4\end{bmatrix}$$
+
+再左乘 $A$ 得回 $A=\begin{bmatrix}2&4\\1&2\end{bmatrix}$ ✓。
+
+**第 4 步：最小二乘解 $x=A^+b$**
+
+$$x=\frac1{25}\begin{bmatrix}2&1\\4&2\end{bmatrix}\begin{bmatrix}10\\5\end{bmatrix}=\frac1{25}\begin{bmatrix}25\\50\end{bmatrix}=\begin{bmatrix}1\\2\end{bmatrix}$$
+
+检验：$Ax=\begin{bmatrix}2&4\\1&2\end{bmatrix}\begin{bmatrix}1\\2\end{bmatrix}=\begin{bmatrix}10\\5\end{bmatrix}=b$，残差为 0（$b$ 恰在列空间里），且 $x$ 落在行空间 $\operatorname{span}\{v_1\}$ 上，正是最小范数解 ✓。
+
+</details>
+
+### 练习 3 · Eckart-Young 最佳秩-1 近似与误差（仿作业，⭐⭐，约 6 分）
+
+设
+
+$$A=\begin{bmatrix}1&3\\3&1\end{bmatrix}$$
+
+（1）求 $A$ 的奇异值；（2）写出 $A$ 的最佳秩-1 近似 $A_1$（Eckart-Young）；（3）给出近似误差 $\|A-A_1\|_2$ 与 $\|A-A_1\|_F$。
+
+<details>
+<summary>📖 参考答案</summary>
+
+**第 1 步：奇异值**
+
+$A$ 对称，$A^\top A=A^2=\begin{bmatrix}1&3\\3&1\end{bmatrix}\begin{bmatrix}1&3\\3&1\end{bmatrix}=\begin{bmatrix}10&6\\6&10\end{bmatrix}$。
+
+特征方程 $(10-\lambda)^2-36=0\Rightarrow 10-\lambda=\pm6\Rightarrow\lambda=16,\ 4$，故
+
+$$\sigma_1=\sqrt{16}=4,\qquad \sigma_2=\sqrt4=2$$
+
+**第 2 步：奇异向量（用于写外积）**
+
+$A^\top A$ 形如 $\begin{bmatrix}a&b\\b&a\end{bmatrix}$，特征向量是固定的 $\frac1{\sqrt2}(1,1)^\top$（对应大特征值）和 $\frac1{\sqrt2}(1,-1)^\top$：
+
+- $v_1=\dfrac1{\sqrt2}\begin{bmatrix}1\\1\end{bmatrix}$，$u_1=\dfrac1{\sigma_1}Av_1=\dfrac1{4}\cdot\dfrac1{\sqrt2}\begin{bmatrix}4\\4\end{bmatrix}=\dfrac1{\sqrt2}\begin{bmatrix}1\\1\end{bmatrix}$。
+
+**第 3 步：最佳秩-1 近似 $A_1=\sigma_1u_1v_1^\top$**
+
+$$A_1=4\cdot\frac1{\sqrt2}\begin{bmatrix}1\\1\end{bmatrix}\cdot\frac1{\sqrt2}\begin{bmatrix}1&1\end{bmatrix}=4\cdot\frac12\begin{bmatrix}1&1\\1&1\end{bmatrix}=\begin{bmatrix}2&2\\2&2\end{bmatrix}$$
+
+**第 4 步：误差**
+
+由 Eckart-Young，截断后的误差就是被丢掉的那个奇异值：
+
+$$\|A-A_1\|_2=\sigma_2=2$$
+
+直接核对：$A-A_1=\begin{bmatrix}1&3\\3&1\end{bmatrix}-\begin{bmatrix}2&2\\2&2\end{bmatrix}=\begin{bmatrix}-1&1\\1&-1\end{bmatrix}$。这是个秩 1 矩阵，其唯一非零奇异值即 $\sigma_2=2$，所以
+
+$$\|A-A_1\|_2=2,\qquad \|A-A_1\|_F=\sqrt{(-1)^2+1^2+1^2+(-1)^2}=\sqrt4=2$$
+
+（秩 1 时 2-范数与 F-范数相等，均等于剩下的那个奇异值 $\sigma_2$ ✓。）
+
+</details>
