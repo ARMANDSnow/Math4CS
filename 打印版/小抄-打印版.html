@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh"><head><meta charset="utf-8">
+<title>小抄</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+ onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});document.body.dataset.ready='1';"></script>
+<style>
+@page { size: A4; margin: 5mm; }
+* { box-sizing: border-box; }
+html,body { margin:0; padding:0; }
+body { font-family:-apple-system,"PingFang SC","Heiti SC","Songti SC",serif;
+  font-size:7.7px; line-height:1.18; color:#000;
+  column-count:3; column-gap:4mm; column-fill:auto; }
+h1 { font-size:11.5px; column-span:all; margin:0 0 2px; padding-bottom:1px;
+  border-bottom:1.6px solid #000; text-align:center; }
+h2 { font-size:8.8px; margin:4px 0 1px; padding:0.5px 3px; background:#000; color:#fff;
+  break-after:avoid; break-inside:avoid; }
+h3 { font-size:7.9px; font-weight:700; margin:2.5px 0 0.5px; border-bottom:0.5px solid #888;
+  break-after:avoid; }
+p { margin:0.6px 0; }
+ul,ol { margin:0.6px 0; padding-left:1.1em; }
+li { margin:0.3px 0; }
+b,strong { font-weight:700; }
+blockquote { margin:0.6px 0; padding:0.3px 0 0.3px 3px; border-left:2px solid #aaa;
+  color:#1a1a1a; background:#f4f4f4; }
+hr { border:0; border-top:0.5px dashed #bbb; margin:2px 0; }
+table { border-collapse:collapse; width:100%; font-size:0.9em; margin:1.5px 0;
+  break-inside:avoid; table-layout:auto; }
+th,td { border:0.4px solid #555; padding:0 1.5px; vertical-align:top; word-break:break-word; }
+th { background:#e2e2e2; font-weight:700; }
+pre { font-size:5.2px; line-height:1.05; white-space:pre; overflow:hidden;
+  margin:1px 0; padding:1px; background:#f4f4f4; border:0.4px solid #ccc; break-inside:avoid; }
+code { font-family:Menlo,monospace; }
+.katex { font-size:1em; }
+.katex-display { margin:1px 0; }
+.katex-display>.katex { white-space:normal; }
+h2,h3,table,pre,tr { break-inside:avoid; }
+h2{background:none!important;color:#000!important;padding:1.5px 0 0.5px!important;border:0!important;border-bottom:1.1px solid #000!important;font-size:8.6px!important;}
+</style></head><body>
+<h1>Math4CS 全量小抄（公式 + 讲解）</h1>
+<blockquote><b>覆盖</b>：顾小东老师（概率·信息论·随机过程·优化）+ 应凯老师（数值算法 NA1–NA8）全部考点，已对齐 12 份复习讲义。<br><b>体例</b>：每条公式都带一句「<b>讲解</b>」说明它在做什么 / 何时用；🔑=高频考点，⚠️=易错点，💡=口诀/技巧。不含例题完整数值解（见 作业全解-HW1-6）。<br><b>结构</b>：A 数学核心（§1–4）｜B 数值算法（§5–13）。</blockquote>
+<blockquote><b>一条主线（贯穿全程）</b>：<b>条件数 = 误差放大倍数 = 问题固有属性（与算法无关）</b>，且 <b>前向误差 ≈ 条件数 × 后向误差</b>。它在标量求根（§5，$\kappa\approx1/\lvert f'\rvert$）、线性系统（§9，$\kappa=\sigma_{\max}/\sigma_{\min}$）里反复出现。<b>矩阵分解地图</b>：一般方阵→LU（§6）；对称正定→Cholesky（§8）；解最小二乘三条路 正规方程→QR（§10）→SVD（§12），稳定性递增。</blockquote>
+<hr>
+<h1>A 数学核心</h1>
+<h2>1. 概率论</h2>
+<p><b>条件概率</b>：$P(X\mid Y)=\dfrac{P(X,Y)}{P(Y)}$。</p>
+<blockquote>讲解：在已知 $Y$ 发生的「子世界」里 $X$ 的概率，等于联合除以条件的边际。</blockquote>
+<p><b>边际化（求和消元）</b>：$P(X)=\sum_y P(X,y)$。</p>
+<blockquote>讲解：把不关心的变量「加掉」，从联合分布得到边际分布。</blockquote>
+<p><b>全概率公式</b>：$P(E)=\sum_i P(E\mid H_i)P(H_i)$，$\{H_i\}$ 互斥且完备。</p>
+<blockquote>讲解：把证据 $E$ 拆到一组完备假设上求和，是贝叶斯<b>分母</b>的算法。⚠️ 别只取一项、别漏加。</blockquote>
+<p><b>贝叶斯公式</b> 🔑：$P(H\mid E)=\dfrac{P(H)\,P(E\mid H)}{P(E)}=\dfrac{P(E\mid H)P(H)}{\sum_i P(E\mid H_i)P(H_i)}$。</p>
+<blockquote>讲解：用新证据 $E$ 把先验更新成后验。<b>先验</b> $P(H)$=看证据前的信念；<b>后验</b> $P(H\mid E)$=看证据后；<b>似然</b> $P(E\mid H)$=假设成立时证据出现的概率（记作 $L(H\mid E)=P(E\mid H)$）；<b>证据/边缘似然</b> $P(E)$=归一化分母。一句话：<b>贝叶斯 = 先验信念 +（似然）证据 → 更新成后验</b>。⚠️ 别把 $P(H\mid E)$（要求的后验）与 $P(E\mid H)$（已知的似然）方向记反。</blockquote>
+<p><b>链式法则</b>：$P(X_1,\dots,X_n)=P(X_1)P(X_2\mid X_1)\cdots P(X_n\mid X_1,\dots,X_{n-1})$。</p>
+<blockquote>讲解：任何联合分布都能按顺序拆成一串条件概率之积。</blockquote>
+<p><b>独立 / 条件独立</b>：$A\perp B\iff P(A,B)=P(A)P(B)\iff P(A\mid B)=P(A)$；$X\perp Y\mid Z\iff P(X,Y\mid Z)=P(X\mid Z)P(Y\mid Z)$。</p>
+<blockquote>讲解：独立=互不提供信息；条件独立=在已知 $Z$ 后互不提供信息（贝叶斯网络核心）。⚠️ 严格独立须对<b>所有取值组合</b>成立。</blockquote>
+<p><b>频率学派 vs 贝叶斯学派</b>：频率派把概率当「长期相对频率」（客观、固定）；贝叶斯派把概率当「逻辑自洽的信念度」（主观、随证据更新），适用于不可重复实验。</p>
+<h3>1.1 贝叶斯网络（紧凑表示联合分布）</h3>
+<blockquote>动机：$n$ 个二值变量的联合分布表有 $2^n-1$ 个独立项，指数爆炸。贝叶斯网络用条件独立把它压缩。</blockquote>
+<ul><li style="margin-left:0.0em"><b>结构</b>：有向无环图（DAG）$G=(V,E)$。<b>节点</b>=随机变量；<b>边</b> $X\to Y$ 表示父 $X$ 对子 $Y$ 有直接概率影响（"X 是 Y 的直接原因"）；<b>无边</b>=（条件）独立。</li><li style="margin-left:0.0em"><b>CPT</b>（条件概率表）：每个节点存 $P(X_i\mid \text{Parents}(X_i))$；根节点（无父）存先验 $P(X_i)$。</li><li style="margin-left:0.0em"><b>联合分解</b> 🔑：$\boxed{P(X_1,\dots,X_n)=\prod_i P(X_i\mid \text{Parents}(X_i))}$。</li></ul>
+<blockquote>讲解（口诀）：<b>父节点写在条件里、根节点是先验，全部连乘</b>。$n$ 个节点对应 $n$ 个因子。</blockquote>
+<ul><li style="margin-left:0.0em"><b>推断</b>：求某个后验时，对无关变量<b>边际化</b>（求和消元）后再代入分解。例：$P(R\mid W)=\dfrac{P(R,W)}{P(W)}$，其中 $P(W,R)=\sum_{s}\sum_{c}P(C{=}c)P(S{=}s\mid c)P(R\mid c)P(W\mid s,R)$。</li></ul>
+<p><b>马尔可夫毯 $MB(X)$</b> 🔑：$X$ 的<b>父节点</b> + <b>子节点</b> + <b>子节点的其它父节点（co-parents）</b>。</p>
+<blockquote>讲解：给定马尔可夫毯，$X$ 与网络中其余所有节点条件独立——它是「屏蔽 $X$ 所需的最小集合」。⚠️ 别漏 co-parents（子的其它父）；叶节点没有子，故只有父。</blockquote>
+<h3>1.2 d-分离（判条件独立的三结构法）🔑</h3>
+<blockquote>判断「给定集合 $Z$，节点 $X,Y$ 是否条件独立」：看它们之间<b>所有路径</b>是否都被「阻断」。全断 ⇒ 条件独立。</blockquote>
+<table><thead><tr><th>结构</th><th>形态</th><th>阻断规则</th></tr></thead><tbody><tr><td>链 Chain</td><td>$A\to B\to C$</td><td>$B$ <b>被观测</b> → 阻断</td></tr><tr><td>分叉 Fork（共因）</td><td>$A\leftarrow B\to C$</td><td>$B$ <b>被观测</b> → 阻断</td></tr><tr><td>汇聚 Collider（v-结构）</td><td>$A\to B\leftarrow C$</td><td>$B$（及其后代）<b>未被观测</b> → 阻断；观测 $B$ 反而<b>打开</b></td></tr></tbody></table>
+<blockquote>💡 <b>口诀</b>：链和分叉「观测中间点就断」；汇聚「观测汇聚点反而通」。<br>⚠️ <b>汇聚反直觉</b>（explaining away，解释消除）：v-结构在 $B$ 未观测时 $A\perp C$；观测 $B$ 反而让 $A,C$ 相关。直觉："结果出现了，知道一个原因没发生，另一个原因就更可能。"</blockquote>
+<hr>
+<h2>2. 信息论</h2>
+<p><b>自信息（信息量）</b>：$I(x)=-\log_2 p(x)=\log_2\dfrac1{p(x)}$（bit）。</p>
+<blockquote>讲解：单个事件的「惊讶度」——越稀有信息越多；$p=1\Rightarrow I=0$。用 $\log$ 是为了可加：两独立事件 $-\log(p_1p_2)=-\log p_1-\log p_2$。</blockquote>
+<p><b>信息熵</b> 🔑：$H(X)=\mathbb{E}\big[-\log_2 p(X)\big]=-\sum_{x}p(x)\log_2 p(x)$（bit）。</p>
+<blockquote>讲解：随机变量的平均不确定性 = 信息量期望 = 最优编码的平均比特数（下界）。<b>均匀分布时最大</b>（$M$ 个等概率 $\Rightarrow H=\log_2 M$）；<b>某取值概率为 1 时 $H=0$</b>。$N$ 个独立、各 $M$ 态事件的信息量 $=N\log_2 M$ bit。</blockquote>
+<p><b>二元熵</b>：$H(p)=-p\log_2 p-(1-p)\log_2(1-p)$，在 $p=0.5$ 取最大值 1 bit。</p>
+<p><b>联合熵</b>：$H(X,Y)=-\sum_{x,y}p(x,y)\log_2 p(x,y)$。</p>
+<blockquote>讲解：一对变量的总不确定性。</blockquote>
+<p><b>条件熵</b>：$H(Y\mid X)=-\sum_{x,y}p(x,y)\log_2 p(y\mid x)$。</p>
+<blockquote>讲解：已知 $X$ 后 $Y$ 剩余的不确定性。$X$ 完全决定 $Y$ 则为 0；$X$ 对 $Y$ 毫无信息则 $H(Y\mid X)=H(Y)$。</blockquote>
+<p><b>链式法则</b> 🔑：$H(X,Y)=H(X)+H(Y\mid X)=H(Y)+H(X\mid Y)$；一般 $H(X_{1:n})=\sum_i H(X_i\mid X_{1:i-1})$。</p>
+<blockquote>讲解：总不确定性 = 第一个变量的 + 给定它之后剩下的。<b>考试算条件熵最快</b>：$H(Y\mid X)=H(X,Y)-H(X)$，不必重新求和。⚠️ 减的是被条件的 $X$ 的熵，别减成 $H(Y)$。</blockquote>
+<p><b>交叉熵</b>：$\text{CE}(p,q)=-\sum_x p(x)\log_2 q(x)$。</p>
+<blockquote>讲解：真实分布是 $p$、却用为 $q$ 设计的编码，平均所需比特数。机器学习里常作分类损失。</blockquote>
+<p><b>KL 散度 / 相对熵</b>：$D_{KL}(p\,\|\,q)=\sum_x p(x)\log_2\dfrac{p(x)}{q(x)}\ge0$。</p>
+<blockquote>讲解：用 $q$ 的编码相比真实 $p$ 多花的「额外比特」，衡量两分布差距。$D_{KL}=0\iff p=q$（吉布斯不等式）；$D_{KL}(p\|q)=\text{CE}(p,q)-H(p)$。⚠️ <b>不对称</b> $D(p\|q)\ne D(q\|p)$，严格说不是距离。</blockquote>
+<p><b>互信息</b> 🔑：$I(X;Y)=\sum_{x,y}p(x,y)\log_2\dfrac{p(x,y)}{p(x)p(y)}=D_{KL}\big(p(x,y)\,\|\,p(x)p(y)\big)$。</p>
+<blockquote>讲解：知道 $Y$ 能减少多少 $X$ 的不确定性。三等价式：</blockquote>
+<p>$$I(X;Y)=H(X)+H(Y)-H(X,Y)=H(X)-H(X\mid Y)=H(Y)-H(Y\mid X)$$ 对称 $I(X;Y)=I(Y;X)$；$\ge0$；$X,Y$ 独立 $\Rightarrow I=0$。⚠️ <b>算出负值一定错</b>。<b>Venn 图</b>：两圆 $H(X),H(Y)$，交集 $=I$，并集 $=H(X,Y)$，左右月牙 $=H(X\mid Y),H(Y\mid X)$。</p>
+<h3>2.1 决策树</h3>
+<ul><li style="margin-left:0.0em">节点：根节点（全数据）、内部节点（对某属性测试）、分支（测试结果）、叶节点（类标签）。</li><li style="margin-left:0.0em"><b>构造原则</b>：选属性使分裂后类别 $Y$ 的条件熵最小。</li><li style="margin-left:0.0em"><b>属性选择</b>：选<b>信息增益</b>最大者 $\boxed{\text{IG}(Y,X)=H(Y)-H(Y\mid X)=I(Y;X)}$。</li></ul>
+<blockquote>讲解：信息增益 = 用属性 $X$ 划分后不确定性下降量，恒等于互信息。⚠️ 属性取值恒定 → IG=0（切不开数据）。</blockquote>
+<h3>2.2 概念判断速记（高频判断题）</h3>
+<ul><li style="margin-left:0.0em">「熵越大 → 对事情越确信」→ <b>错</b>（熵大=越<b>不</b>确定/越难猜）。</li><li style="margin-left:0.0em">「交叉熵 / KL 衡量两分布的差异/距离」→ <b>对</b>（但记住 KL 不对称、非真距离）。</li><li style="margin-left:0.0em">决策树选特征 → 选信息增益 $I(Y;A)$ <b>最大</b>者；无区分力特征 IG=0。</li></ul>
+<blockquote>💡 <b>常用对数值</b>：$\log_2\tfrac12=-1,\ \log_2\tfrac14=-2,\ \log_2\tfrac18=-3$；$\log_2 3\approx1.585,\ \log_2 5\approx2.322,\ \log_2 6\approx2.585$；$\log_2 256=8$。约定 $0\log0=0$。</blockquote>
+<hr>
+<h2>3. 随机过程与马尔可夫</h2>
+<p><b>马尔可夫性质</b>：$\mathbb{P}[S_{t+1}\mid S_1,\dots,S_t]=\mathbb{P}[S_{t+1}\mid S_t]$。</p>
+<blockquote>讲解：「给定现在，未来与过去无关」——无记忆性。本质是<b>时间上的条件独立</b>（与 §1 条件独立同源）。</blockquote>
+<p><b>转移矩阵</b>：$p_{ij}=P[S_{t+1}=j\mid S_t=i]$，每<b>行</b>和为 1（$\sum_j p_{ij}=1$）。</p>
+<blockquote>讲解：行=当前状态，列=目标状态；是个随机矩阵。⚠️ 行和为 1（不是列），检查矩阵先验证这点。</blockquote>
+<ul><li style="margin-left:0.0em"><b>$n$ 步转移</b>（单点→单点）🔑：$P[S_{t+n}=j\mid S_t=i]=(P^n)_{ij}$。</li></ul>
+<blockquote>讲解：矩阵幂的 $(i,j)$ 元就是 $n$ 步后从 $i$ 到 $j$ 的概率。</blockquote>
+<ul><li style="margin-left:0.0em"><b>分布演化</b>（整个分布）🔑：$\pi_n=\pi_0\,P^n$（$\pi$ 为<b>行向量</b>，左乘）。</li></ul>
+<blockquote>⚠️ <b>最易丢分</b>：问「从 $i$ 出发 $n$ 步到 $j$」用 $(P^n)_{ij}$ 单个元素；问「整个分布如何演化」用行向量 $\pi_0P^n$。本课约定分布是行向量、右乘 $P$。</blockquote>
+<ul><li style="margin-left:0.0em"><b>平稳分布</b>：$\pi=\pi P$（即 $\pi_{n+1}=\pi_n$）且 $\sum_i\pi_i=1$，$\pi=\lim_{n\to\infty}\pi_0 P^n$。</li></ul>
+<blockquote>讲解：长期稳定、不再随时间变化的分布；是 $P$ 对应特征值 1 的<b>左特征向量</b>（与 §11 特征值问题相通）。⚠️ 解 $\pi=\pi P$ 后<b>必须加归一化</b> $\sum\pi_i=1$，否则解不唯一。对「性质好」（不可约、非周期）的链，从任何初始分布都收敛到同一 $\pi$。</blockquote>
+<p><b>马尔可夫决策过程 MDP</b>：五元组 $(S,A,\{P_{sa}\},R,\gamma)$ —— 状态集、动作集、转移概率、奖励 $R:S\times A\to\mathbb{R}$、折扣 $\gamma\in[0,1)$。</p>
+<blockquote>讲解：带「决策 + 奖励」的马尔可夫过程，目标最大化长期回报。<b>折扣回报</b> $R_t=\sum_{i=t}^\infty\gamma^i r_i=r_t+\gamma r_{t+1}+\cdots$，$\gamma$ 让近期奖励比远期值钱、并保证无穷和收敛；$\gamma$ 越小越短视。<b>Bellman 一步备份</b> $Q(s,a)=R(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V(s')$。</blockquote>
+<hr>
+<h2>4. 优化</h2>
+<p><b>一般形式</b>：$\min f_0(x)$ s.t. $f_i(x)\le0\ (i{=}1..m)$，$h_j(x)=0\ (j{=}1..p)$，$x\in\chi$。 <b>等价变换</b>：$\max f\iff\min(-f)$；$g\ge0\iff -g\le0$；$g=0\iff g\le0\ \text{且}\ -g\le0$。</p>
+<blockquote>讲解：所有问题都能化成「min + 不等式≤0 + 等式=0」的标准模板。$-\nabla f_0$=下降最快方向；最优 $x^\star$ 常在「目标等高线与可行域边界相切」处。</blockquote>
+<h3>4.1 凸性与正定（PSD/PD）</h3>
+<p><b>凸函数</b>：$f(\theta x+(1-\theta)y)\le\theta f(x)+(1-\theta)f(y)$，$0\le\theta\le1$（割线在曲线上方）。</p>
+<blockquote>讲解：凸优化的核心好处——<b>任何局部最优都是全局最优</b>（"碗 🥣"，无杂散坑），通常有多项式算法。</blockquote>
+<p><b>正定 / 半正定</b>：$\forall x,\ x^\top Ax\ge0\Rightarrow A\succeq0$（PSD）；$\forall x\ne0,\ x^\top Ax>0\Rightarrow A\succ0$（PD）。</p>
+<blockquote>讲解：等价于「对称 + 所有特征值 $\ge0$（PD 则 $>0$）」。PD ⇒ PSD。<b>关键链</b>：$P\succeq0\iff f(x)=x^\top Px$ 凸 ⟺ 图像是碗 ⟺ QP/QCQP 可漂亮求解。</blockquote>
+<ul><li style="margin-left:0.0em">💡 <b>2×2 对称判 PD（Sylvester）</b>：$P_{11}>0$ 且 $\det P>0$（顺序主子式全正）。</li><li style="margin-left:0.0em"><b>$A^\top A$ 永远 PSD</b>：$x^\top(A^\top A)x=\|Ax\|_2^2\ge0$ ⇒ 最小二乘永远凸。</li><li style="margin-left:0.0em">几何对照：$\text{diag}(1,1)$ 朝上的碗（PD）；$\text{diag}(1,0)$ 水槽（PSD）；$\text{diag}(1,-1)$ 马鞍（不定）。</li></ul>
+<h3>4.2 范数与内积（线代复习）</h3>
+<p>内积 $x^\top y=\sum_i x_iy_i$（$=0$ 即正交）。<b>向量 $p$-范数</b>：$\|x\|_p=\big(\sum_k|x_k|^p\big)^{1/p}$；$\|x\|_\infty=\max_k|x_k|$。（详见 §9。）</p>
+<h3>4.3 凸优化问题分类（LP ⊂ QP ⊂ QCQP；GP 另一支）🔑</h3>
+<table><thead><tr><th>类型</th><th>目标</th><th>约束</th><th>形式</th></tr></thead><tbody><tr><td><b>LP</b> 线性规划</td><td>线性</td><td>线性</td><td>$\min c^\top x$ s.t. $Ax\le b,\ x\ge0$</td></tr><tr><td><b>QP</b> 二次规划</td><td>凸二次</td><td><b>线性</b></td><td>$\min\tfrac12x^\top Px+q^\top x+r$ s.t. $Ax\le b$，需 $P\succeq0$</td></tr><tr><td><b>QCQP</b> 二次约束二次规划</td><td>凸二次</td><td><b>二次</b></td><td>$\min\tfrac12 x^\top P_0x+q_0^\top x+r_0$ s.t. $\tfrac12 x^\top P_ix+q_i^\top x+r_i\le0,\ Ax=b$，所有 $P_i\succeq0$</td></tr><tr><td><b>GP</b> 几何规划</td><td>posynomial</td><td>posynomial≤、monomial=</td><td>$\min f_0$ s.t. posynomial $\le b_i$、monomial $=b_j$、$x>0$</td></tr><tr><td><b>SDP</b> 半定规划</td><td>线性</td><td>半正定矩阵约束</td><td>嵌套谱系 LP⊂QP⊂SOCP⊂SDP⊂Convex</td></tr></tbody></table>
+<blockquote>💡 <b>判别口诀</b>（从最严的类倒着排除）：全线性=<b>LP</b>；目标二次+约束线性=<b>QP</b>；<b>只要有一条二次约束=QCQP</b>；负指数/变量相除/$x>0$=<b>GP</b>。<br>⚠️ <b>陷阱</b>：①目标线性但有二次约束 → <b>QCQP 不是 LP</b>（如 $\min 2x_1+x_2$ s.t. $x_1^2+x_2^2\le5$）；②$x_i^2=1$ / $x_i\in\{-1,1\}$ 是<b>非凸</b>（离散点集，NP-hard，如 Max Cut），看似 QCQP 实则不可凸解；③QP 必须 $P\succeq0$ 否则非凸。</blockquote>
+<p><b>单项式 / 正项式</b>：单项式 $f(x)=c\,x_1^{a_1}\cdots x_n^{a_n}$（$c\ge0$，<b>$a_i\in\mathbb{R}$ 任意实数</b>，可负可分数）；正项式（posynomial）= 单项式之和。</p>
+<blockquote>讲解：GP 通过 $\tilde x=\log x$ 代换，单项式 $\to e^{a^\top\tilde x+\log c}$，posynomial 变 log-sum-exp（凸），整个 GP 转成<b>凸问题</b>用内点法解。⚠️ GP 单项式指数可任意实数（和高中"单项式"不同），系数须 $\ge0$、$x>0$。</blockquote>
+<h3>4.4 LP 标准形 + 四条转换规则</h3>
+<p>标准形 $\max c^\top x$ s.t. $Ax\le b,\ x\ge0$。<b>几何</b>：每条 $a_i^\top x\le b_i$=半空间，交集=多面体；🔑<b>最优解（若存在且有界）必在多面体某角点（顶点）</b>——单纯形法在角点间跳。</p>
+<ul><li style="margin-left:0.0em">$\min c^\top x\iff\max(-c^\top x)$；</li><li style="margin-left:0.0em">$a^\top x\ge b\Rightarrow -a^\top x\le -b$；</li><li style="margin-left:0.0em">$a^\top x=b\Rightarrow a^\top x\le b$ 且 $-a^\top x\le -b$；</li><li style="margin-left:0.0em"><b>自由变量</b> $x_j=x_j^+-x_j^-$（$x_j^\pm\ge0$）。</li><li style="margin-left:0.0em"><b>绝对值线性化</b>：$|x|=\min\{t:\ x\le t,\ -x\le t\}$，最小化时 $t$ 被压到 $=|x|$；目标里的 $|x|$ 换成 $t$。</li></ul>
+<h3>4.5 无约束极小化</h3>
+<ul><li style="margin-left:0.0em"><b>最优条件</b>（$f$ 凸、二阶连续可导）：$\nabla f(x^\star)=0$。梯度 $\nabla f=\big(\tfrac{\partial f}{\partial x_1},\dots,\tfrac{\partial f}{\partial x_n}\big)^\top$。</li><li style="margin-left:0.0em"><b>梯度下降</b>：$x^{(t+1)}=x^{(t)}-\eta_t\nabla f(x^{(t)})$。</li></ul>
+<blockquote>讲解：沿负梯度（最速下降）走，$\eta_t$ 步长。一阶方法，便宜但慢。<b>最大化改 $+\eta\nabla f$（梯度上升）</b>。<br>⚠️ 步长效应：太小→慢；太大→在最低点两侧振荡；非常大→发散。曲率悬殊（如 $0.01x_1^2+x_2^2$）→之字形极慢，出路是归一化或用牛顿法。带约束时一步后<b>投影回可行域</b>。</blockquote>
+<ul><li style="margin-left:0.0em"><b>牛顿法</b>：$x^{(t+1)}=x^{(t)}-[\nabla^2 f(x^{(t)})]^{-1}\nabla f(x^{(t)})$，Hessian $\nabla^2 f=\big(\tfrac{\partial^2 f}{\partial x_i\partial x_j}\big)$。</li></ul>
+<blockquote>讲解：用二阶泰勒近似，收敛快。🔑 <b>对任何凸二次</b> $f=\tfrac12x^\top Px+q^\top x+r$（$P\succ0$），从任意点<b>一步</b>到 $x^\star=-P^{-1}q$。代价：Hessian $O(n^2)$ 存、$O(n^3)$ 求逆，大规模用 L-BFGS/Adam。</blockquote>
+<ul><li style="margin-left:0.0em"><b>下降方向判据</b>：$d$ 是 $x$ 处下降方向 $\iff \nabla f(x)^\top d<0$（与负梯度夹角 &lt;90°）。</li></ul>
+<h3>4.6 有约束极小化：罚函数 / 内点法</h3>
+<p><b>拉格朗日乘子法</b>：$L(x,\lambda)=f(x)+\sum_i\lambda_i g_i(x)$，把约束并进目标。</p>
+<p><b>二次罚（外点罚）</b>：等式约束 $h(x)=0$ → $\min f_0(x)+\tfrac{\rho}{2}h(x)^2$。</p>
+<blockquote>讲解：满足约束罚=0，违反给平方惩罚，$\rho$ 由小到大。用平方（非 $|\cdot|$）因处处可导。🔑 <b>适用区分</b>：允许迭代点<b>暂时不可行</b>→二次罚；要求<b>始终严格可行</b>→内点/障碍。</blockquote>
+<p><b>内点法 / 对数障碍</b>（可微近似指示罚）：理想指示 $I_-(u)=0\,(u\le0)$ 或 $\infty\,(u>0)$（不可微），近似 $I_-(u)\approx-\mu\log(-u)$。 $$\min f_0(x)+\mu\varphi(x),\quad \varphi(x)=-\sum_i\log(-g_i(x))\ \ \text{s.t. } Ax=b$$</p>
+<blockquote>讲解：$u\to0^-$（逼近边界）惩罚 $\to\infty$，像「无形的墙」把点关在内部（故名 interior）。<b>中心路径</b> $\{x^\star(\mu)\}$：$\mu$ 大→解被推到可行域中心（好解）；$\mu\to0^+$→逼近真最优（常在边界角，越来越病态）。</blockquote>
+<ul><li style="margin-left:0.0em"><b>障碍法（路径跟踪）</b>：给定可行 $x$、$\mu$、容差 $\epsilon$、缩减因子 $0<\beta<1$，重复：① 中心步（牛顿法解 $\min\mu f_0+\varphi$）② 更新 $x$ ③ 若 $m\mu<\epsilon$ 停 ④ $\mu\leftarrow\beta\mu$。对比：单纯形走外边角点，内点法走内里中心路径。</li></ul>
+<h3>4.7 对偶与 KKT（真题 Q5 考点）🔑</h3>
+<p><b>Lagrange 对偶构造</b>（对 $\min f_0$ s.t. $f_i(x)\le0$ 乘子 $\mu_i\ge0$、$h_j(x)=0$ 乘子 $\nu_j$ 无限制）：</p>
+<ul><li style="margin-left:0.0em"><b>Lagrange 函数</b> $L(x,\mu,\nu)=f_0(x)+\sum_i\mu_if_i(x)+\sum_j\nu_jh_j(x)$；</li><li style="margin-left:0.0em"><b>对偶函数</b> $g(\mu,\nu)=\inf_x L$（凸时令 $\nabla_xL=0$ 解出 $x$ 回代）；</li><li style="margin-left:0.0em"><b>对偶问题</b> $\max_{\mu\ge0,\nu}g(\mu,\nu)$，最优值 $d^\star$。</li></ul>
+<blockquote>讲解：$g$ 是把约束「折价塞进目标」后取下确界得到的<b>下界函数</b>；对偶就是把下界顶到最高。</blockquote>
+<ul><li style="margin-left:0.0em"><b>弱对偶</b> $d^\star\le p^\star$（恒成立）；<b>强对偶</b> $d^\star=p^\star$ 当<b>凸 + Slater 条件</b>（存在严格可行内点；仿射约束更宽松）。</li><li style="margin-left:0.0em"><b>KKT 条件</b>（约束 $g(x)\le0$、$L=f_0+\mu g$）四条：</li></ul>
+<p>$$\underbrace{\nabla f_0+\mu\nabla g=0}_{\text{平稳}},\quad \underbrace{g(x)\le0}_{\text{原始可行}},\quad \underbrace{\mu\ge0}_{\text{对偶可行}},\quad \underbrace{\mu\,g(x)=0}_{\text{互补松弛}}$$</p>
+<blockquote>💡 <b>求解第一步——判约束是否 active</b>：先求无约束最优 $\hat x$；若 $\hat x$ 满足约束 → 约束<b>失效</b>，$\mu^\star=0,\ x^\star=\hat x$；若越界 → 约束 <b>active</b>（$g=0$），$\mu^\star>0$，联立平稳性 + $g(x)=0$ 解。凸问题满足 KKT ⟺ 全局最优。</blockquote>
+<hr>
+<h1>B 数值算法</h1>
+<h2>5. 误差分析 🔑</h2>
+<table><thead><tr><th>量</th><th>公式</th><th>能否算</th></tr></thead><tbody><tr><td>绝对误差</td><td>$\lvert x_{est}-x^\star\rvert$</td><td>需真值，一般算不出</td></tr><tr><td>相对误差</td><td>$\lvert x_{est}-x^\star\rvert/\lvert x^\star\rvert$</td><td>同上</td></tr><tr><td><b>前向误差</b></td><td>$\lvert x_{est}-x^\star\rvert$（解空间）</td><td>通常算不出（需真根）</td></tr><tr><td><b>后向误差</b>=残差</td><td>$\lvert f(x_{est})\rvert$（方程空间）</td><td><b>能算</b>（代回 $f$）</td></tr><tr><td><b>条件数</b></td><td>$\dfrac{\text{前向}}{\text{后向}}\approx\dfrac1{\lvert f'(x^\star)\rvert}$</td><td>误差放大倍数</td></tr></tbody></table>
+<p><b>关系式</b> 🔑：$\text{前向误差}\approx(\text{条件数})\times\text{后向误差}$。</p>
+<blockquote>讲解：<b>前向</b>看「解」$\lvert x_{est}-x^\star\rvert$，<b>后向</b>看「代回方程」$\lvert f(x_{est})\rvert$，中间隔着条件数。⚠️ 残差小 ≠ 解准。</blockquote>
+<p><b>条件数泰勒推导</b>（必考流程）：① 一阶泰勒 $f(x_{est})\approx f(x^\star)+f'(x^\star)(x_{est}-x^\star)$；② $f(x^\star)=0$ 消去首项 → $f(x_{est})\approx f'(x^\star)(x_{est}-x^\star)$；③ 整理 $\lvert x_{est}-x^\star\rvert\approx\dfrac{\lvert f(x_{est})\rvert}{\lvert f'(x^\star)\rvert}$ → ④ $\boxed{\kappa\approx\dfrac1{\lvert f'(x^\star)\rvert}}$。</p>
+<blockquote>💡 <b>换阶规则</b>（极易漏）：「<b>求几阶的根，就用高一阶的导数</b>」。求根 $f=0$→$\kappa\approx1/\lvert f'\rvert$；求极小/极大 $f'=0$→后向误差 $\lvert f'(x_{est})\rvert$、$\kappa\approx1/\lvert f''(x^\star)\rvert$；求拐点 $g''=0$→$\kappa\approx1/\lvert g'''\rvert$。</blockquote>
+<p><b>良态 / 病态</b>：$f'(x^\star)$ 大（根处陡）→$\kappa$ 小→<b>良态</b>（残差小则解准）；$f'(x^\star)$ 小（根处平）→$\kappa$ 大→<b>病态</b>（残差小也骗人）。⚠️ <b>条件数是问题固有属性，与算法无关</b>——病态问题再好的算法也救不了。</p>
+<p><b>四种误差来源</b>：① 舍入/截断（存 $\pi$ 有限位）② 离散化（差商近似导数）③ 建模（取 $g=9.8$）④ 输入（测量/录入误差）。</p>
+<p><b>浮点数（IEEE 754 单精度 32 位）</b>：$\pm(1.\text{尾数})\times2^{\text{指数}}$，1 位符号 + 8 位指数（偏置 +127）+ 23 位尾数（隐藏首位 1）。尾数有限 → 舍入误差；许多十进制小数二进制存不下（$0.1$ 无限循环）→ <code>0.1+0.2≠0.3</code>。</p>
+<hr>
+<h2>6. 线性系统 $Ax=b$</h2>
+<p><b>可解性</b>（$A\in\mathbb{R}^{m\times n}$）：</p>
+<table><thead><tr><th>形状</th><th>名称</th><th>解</th></tr></thead><tbody><tr><td>$m=n$ 方阵满秩</td><td>适定</td><td><b>唯一解</b></td></tr><tr><td>$m>n$ 高瘦</td><td>超定 over-determined</td><td>一般无解→最小二乘（§7）</td></tr><tr><td>$m<n$ 矮胖</td><td>欠定 under-determined</td><td>无穷多解→最小范数解（§7）</td></tr></tbody></table>
+<blockquote>细则：唯一解需 $A$ 方阵可逆，或 $m>n$ 列满秩且 $b\in\text{Col}(A)$；无解 ⟺ $b\notin\text{Col}(A)$。</blockquote>
+<p><b>三种行操作矩阵</b>：</p>
+<table><thead><tr><th>操作</th><th>矩阵</th><th>逆</th></tr></thead><tbody><tr><td>置换（换行）</td><td>$P$（交换 $I$ 的行）</td><td>自身</td></tr><tr><td>缩放（行×常数）</td><td>$S=\text{diag}(a_i)$</td><td>对角元取倒数</td></tr><tr><td><b>消元</b></td><td>$E=I+\mu_{rs}E^{(rs)}$，乘子带负号</td><td><b>乘子变号</b>（"减回去"="加回来"）</td></tr></tbody></table>
+<p><b>LU 分解</b> 🔑：$A=LU$，$L$ 下三角（对角线全 1、下方存乘子 $m_{ij}=a_{ij}/a_{jj}$），$U$ 上三角（消元结果）。</p>
+<blockquote>讲解：高斯消元 $E_k\cdots E_1 A=U\Rightarrow A=E_1^{-1}\cdots E_k^{-1}U=LU$，这堆逆连乘恰是下三角 $L$。<b>前提</b>：消元不需换行时 LU 唯一。</blockquote>
+<ul><li style="margin-left:0.0em">💡 <b>手算口诀</b>：<b>前向消元写 $U$ → 乘子变号写 $L$ → 前代解 $y$ → 回代解 $x$ → 代回验算</b>。</li><li style="margin-left:0.0em"><b>解法</b>：令 $Ux=y$，先 $Ly=b$（<b>前代</b>，从上往下 $y_i=\tfrac1{l_{ii}}[b_i-\sum_{j<i}l_{ij}y_j]$），再 $Ux=y$（<b>回代</b>，从下往上 $x_i=\tfrac1{u_{ii}}[y_i-\sum_{j>i}u_{ij}x_j]$）。</li><li style="margin-left:0.0em"><b>复杂度</b> 💡：分解 $O(n^3)$（约 $n^3/3$），每个 $b$ 前代+回代各 $O(n^2)$。<b>为什么用 LU</b>：同一 $A$ 多个 $b$ 时，只分解一次，后续每个 $b$ 只花 $O(n^2)$。</li><li style="margin-left:0.0em"><b>选主元</b>：主元为 0 不能直接消元（除零）→ 用置换得 $PA=LU$。⚠️ 消元中「主元变 0」≠ 矩阵不可逆（换行即可）；真正奇异的标志是消元到底后 $U$ 对角线出现 0（$\prod u_{ii}=\pm\det A=0$）。</li></ul>
+<hr>
+<h2>7. 最小二乘与正则化</h2>
+<p><b>回归</b>：广义线性模型 $f(x)=c_1\varphi_1(x)+\cdots+c_p\varphi_p(x)$（对参数 $c_j$ 线性，对 $x$ 可非线性），$m$ 个数据点构成 $\Phi c=y$，$\Phi_{kj}=\varphi_j(x^{(k)})$。</p>
+<blockquote>讲解：多项式回归取 $\varphi_i(x)=x^{i-1}$，$\Phi$ 是范德蒙（Vandermonde）矩阵。恰定（$n$ 点 $n$ 参）时方阵直解；点多于参→超定→最小二乘。</blockquote>
+<p><b>最小二乘</b>：$Ax\approx b$ 无精确解（过定 $m>n$）时，$\min_x\|b-Ax\|_2^2=\sum_i(\text{预测}_i-\text{观测}_i)^2$。</p>
+<p><b>正规方程</b>（推导三步）：① 展开 $\|Ax-b\|_2^2=x^\top A^\top Ax-2b^\top Ax+b^\top b$（中间项系数 <b>−2</b>，因 $x^\top A^\top b=b^\top Ax$ 标量）；② 梯度置零 $2A^\top Ax-2A^\top b=0$；③ $\boxed{A^\top A\,x=A^\top b}$，列满秩则 $x=(A^\top A)^{-1}A^\top b$。</p>
+<blockquote>讲解：<b>几何</b>——残差 $Ax-b\perp$ 列空间（$Ax$ 是 $b$ 在列空间的正交投影），即 $A^\top(b-Ax)=0$，"normal=正交"。⚠️ 缺点：把条件数<b>平方</b>（见 §9），病态时改 QR/SVD。</blockquote>
+<p><b>Gram 矩阵 $A^\top A$</b>：对称、半正定（$x^\top A^\top Ax=\|Ax\|^2\ge0$）；列满秩则正定可逆，可用 Cholesky 解。</p>
+<p><b>直线拟合 $y=kx+b$ 模板</b>：$A^\top A=\begin{bmatrix}\sum x_i^2&\sum x_i\\\sum x_i&m\end{bmatrix}$，$A^\top y=\begin{bmatrix}\sum x_iy_i\\\sum y_i\end{bmatrix}$，$2\times2$ 求逆即得。验残差⊥两列：$\sum r_i=0$ 且 $\sum x_ir_i=0$。</p>
+<p><b>最小范数解</b>（欠定 $m<n$ 行满秩）：$\min\|x\|_2$ s.t. $Ax=b$，解 $\boxed{x_s=A^\top(AA^\top)^{-1}b}$。</p>
+<blockquote>讲解：$x_s$ 落在行空间，其余可行解的「自由分量」在零空间、与 $x_s$ 正交，勾股定理范数最小。<b>证明套路</b>：①验可行 $Ax_s=b$；②证 $(x-x_s)\perp x_s$（靠 $A(x-x_s)=0$）；③勾股 $\|x\|^2=\|x-x_s\|^2+\|x_s\|^2\ge\|x_s\|^2$。💡 <b>镜像记忆</b>：超定用 $A^\top A$，欠定用 $AA^\top$。</blockquote>
+<p><b>正则化</b>（加惩罚防过拟合、改善条件）：</p>
+<ul><li style="margin-left:0.0em"><b>Tikhonov / 岭（L2）</b>：$\min\|Ax-b\|_2^2+\lambda\|x\|_2^2$，解 $\boxed{(A^\top A+\lambda I)x=A^\top b}$。</li></ul>
+<blockquote>讲解：$\lambda>0$ 把每个特征值抬高 $\lambda$，使 $A^\top A+\lambda I$ 必正定可逆、条件数变好；$\lambda$ 大→解小而平滑（偏差大），$\lambda$ 小→近原最小二乘。图像去模糊模板 $\min\|G\vec x-\vec x_0\|_2^2+\lambda\|\vec x\|_2^2$。</blockquote>
+<ul><li style="margin-left:0.0em"><b>Lasso（L1）</b>：$\min\|Ax-b\|_2^2+\beta\|x\|_1$ —— 产生稀疏解。</li><li style="margin-left:0.0em"><b>Elastic Net</b>：L1+L2 折中。</li></ul>
+<hr>
+<h2>8. Cholesky 分解（考概念 + 与 QR 关系）</h2>
+<p><b>定义</b>：对称正定 $C\succ0\Rightarrow C=LL^\top$，$L$ 下三角、对角元为正。</p>
+<blockquote>讲解：LU 在 SPD 下的特化版，<b>省一半内存、省一半计算</b>，无需选主元就稳定。解 SPD 系统：前代 $Ly=b$ + 回代 $L^\top x=y$。存在条件仅对称正定（对角元开方时根号内须 $>0$）。</blockquote>
+<p><b>递推求 $L$</b>：$l_{jj}=\sqrt{c_{jj}-\sum_{k<j}l_{jk}^2}$，$l_{ij}=\tfrac1{l_{jj}}\big(c_{ij}-\sum_{k<j}l_{ik}l_{jk}\big)$。</p>
+<blockquote>直觉：对角元开方，非对角元「减掉已算部分再除以对角元」。</blockquote>
+<p><b>SPD 判别（Sylvester）</b>：所有顺序主子式 $>0$ ⟺ SPD（也可所有特征值 $>0$）。</p>
+<p><b>与 QR 的关系</b>（往年大题，§10.5 详）：$A=QR\Rightarrow A^\top A=R^\top R$，对比 Cholesky $A^\top A=LL^\top$ 得 $\boxed{L=R^\top}$。⚠️ 是 $L=R^\top$ 不是 $L=R$。</p>
+<hr>
+<h2>9. 范数 · 条件数</h2>
+<p><b>向量范数</b>（单位球形状）：$\|x\|_1=\sum_i\lvert x_i\rvert$（菱形）、$\|x\|_2=\sqrt{\sum x_i^2}$（圆）、$\|x\|_\infty=\max_i\lvert x_i\rvert$（方形）。例 $x=(3,-4)$：$\|x\|_1=7,\|x\|_2=5,\|x\|_\infty=4$。</p>
+<p><b>诱导（算子）矩阵范数</b> 🔑：$\|A\|\equiv\max_{x\ne0}\dfrac{\|Ax\|}{\|x\|}$（矩阵作为变换的最大拉伸率）。</p>
+<table><thead><tr><th>范数</th><th>计算</th><th>口诀</th></tr></thead><tbody><tr><td>$\lVert A\rVert_1$</td><td>$\max_j\sum_i\lvert a_{ij}\rvert$</td><td><b>最大列绝对和</b>（"1 看列"）</td></tr><tr><td>$\lVert A\rVert_\infty$</td><td>$\max_i\sum_j\lvert a_{ij}\rvert$</td><td><b>最大行绝对和</b>（"∞ 看行"）</td></tr><tr><td>$\lVert A\rVert_2$</td><td>$\sqrt{\lambda_{\max}(A^\top A)}=\sigma_{\max}$</td><td><b>谱范数</b>（最大奇异值）</td></tr></tbody></table>
+<p><b>Frobenius 范数</b>（"展开"，区别于诱导）：$\|A\|_F=\sqrt{\sum_{i,j}a_{ij}^2}=\sqrt{\sum_i\sigma_i^2}$。⚠️ $\|A\|_F\ne\|A\|_2$。</p>
+<p><b>矩阵条件数</b> 🔑：$\text{cond}(A)=\|A\|\,\|A^{-1}\|$；$\text{cond}_2(A)=\dfrac{\sigma_{\max}}{\sigma_{\min}}$；$A$ 不可逆则 $=\infty$。</p>
+<blockquote>讲解：解 $Ax=b$ 时输入相对误差被放大的最大倍数。$\approx1$ 良态，很大病态。正交矩阵 $\text{cond}_2=1$（最理想）。⚠️ <b>$\text{cond}(A)\ge1$ 恒成立</b>（$\|A\|\|A^{-1}\|\ge\|AA^{-1}\|=\|I\|=1$），算出 $<1$ 一定错。</blockquote>
+<p><b>扰动放大不等式</b>：近似解 $\tilde x$、残差 $r=b-A\tilde x$：$\dfrac{\|\tilde x-x\|}{\|x\|}\le\text{cond}(A)\dfrac{\|r\|}{\|b\|}$。</p>
+<blockquote>讲解：残差再小，解的相对误差也可能被 $\text{cond}(A)$ 放大那么多倍——病态系统「残差小」靠不住。</blockquote>
+<p><b>条件数平方定理</b> 🔑：$\boxed{\text{cond}_2(A^\top A)=[\text{cond}_2(A)]^2}$。</p>
+<blockquote>讲解：$A^\top A$ 特征值是 $A$ 奇异值的平方，故条件数平方。这是法方程数值上不如 QR/SVD 的根本原因——$A$ 病态（$10^4$）则 $A^\top A$ 到 $10^8$，有效数字损失翻倍。</blockquote>
+<hr>
+<h2>10. QR 分解 🔑</h2>
+<p><b>定义</b>：$A\in\mathbb{R}^{m\times n}$（$m\ge n$，列满秩）$=QR$，$Q$ 列正交、$R$ 上三角（记录"如何用正交方向组合回原列"）。</p>
+<ul><li style="margin-left:0.0em"><b>完全 QR</b>：$Q\in\mathbb{R}^{m\times m}$（真正交方阵），$R\in\mathbb{R}^{m\times n}$（下方 $m-n$ 行为 0）—— <b>Householder</b> 产出。</li><li style="margin-left:0.0em"><b>约化 QR</b>：$Q\in\mathbb{R}^{m\times n}$，$R\in\mathbb{R}^{n\times n}$ —— <b>Gram-Schmidt</b> 产出。$A=[Q_1\ Q_2]\big[\begin{smallmatrix}R_1\\0\end{smallmatrix}\big]=Q_1R_1$。</li></ul>
+<p><b>正交矩阵</b>：$Q^\top Q=QQ^\top=I\iff Q^{-1}=Q^\top$。</p>
+<blockquote>讲解：<b>保长保内积保角度</b> $\|Qx\|_2=\|x\|_2$、$(Qx)^\top(Qy)=x^\top y$（证：$\|Qx\|^2=x^\top Q^\top Qx=x^\top x$）。几何上是旋转/反射，不拉伸 ⇒ 不放大误差、$\text{cond}_2=1$、数值稳定。</blockquote>
+<p><b>投影 / 正交分解</b>：$\text{proj}_q(a)=(a^\top q)q$（$\|q\|=1$），$a=\underbrace{(a^\top q)q}_{\text{平行}}+\underbrace{(a-(a^\top q)q)}_{\text{垂直}\perp q}$。</p>
+<blockquote>讲解：减掉投影后就与 $q$ 正交 —— Gram-Schmidt 的全部秘密。</blockquote>
+<h3>10.1 Gram-Schmidt</h3>
+<p><b>经典 GS（CGS）</b>：$q_1=a_1/\|a_1\|$；$v_j=a_j-\sum_{i<j}(a_j^\top q_i)q_i$，$q_j=v_j/\|v_j\|$。$R_{ij}=q_i^\top a_j\,(i<j)$，$R_{jj}=\|v_j\|$。</p>
+<blockquote>讲解：逐列减掉在已有正交方向上的投影再单位化。⚠️ $R_{ij}$ 用<b>原列 $a_j$</b>（不是 $v_j$）；算 $q_3$ 要减 $q_1,q_2$ <b>两个</b>投影；忘归一化则 $R$ 错。</blockquote>
+<p><b>修正 GS（MGS）</b>：唯一区别——算出 $q_i$ 立刻从剩余所有列减去其分量（$r_{ij}=q_i^\top v$ 用当前已减过的 $v$）。</p>
+<blockquote>讲解：数学结果同 CGS；浮点下及时吃掉舍入，正交性损失小得多。<b>问「为什么用 MGS」答：数值更稳</b>。</blockquote>
+<h3>10.2 Householder 反射</h3>
+<p><b>反射矩阵</b>：$H_v=I-\dfrac{2vv^\top}{v^\top v}$（$\|v\|=1$ 则 $H=I-2vv^\top$）。性质：$H^\top=H$（对称）、$H^2=I$（自逆，$H^{-1}=H$）、正交。</p>
+<blockquote>讲解：关于「以 $v$ 为法向的超平面」的镜面反射，反射两次回原地。⚠️ 漏系数 2 就不是反射（不正交）。</blockquote>
+<p><b>清零取法</b>：把列 $a$ 反射成 $c\,e_1$，取 $v=a-c\,e_1$，$c=\pm\|a\|_2$。</p>
+<blockquote>讲解：手算用 $c=+\|a\|$；数值上取 $c=-\text{sgn}(a_1)\|a\|$（避免相减相消）。两符号都给合法 QR，只差列正负号。⚠️ 若某列已是 $c\,e_1$ 形（如 $(1,0,0)^\top$）则 $v=0$、$H=I$、跳过。</blockquote>
+<p><b>Householder QR</b>：逐列构造 $H_{v_k}$ 把对角线下方清零，$H_{n-1}\cdots H_1A=R$，故 $A=\underbrace{H_1\cdots H_{n-1}}_{Q}R$（每个 $H$ 自逆，挪到右边直接连乘）。$Q$ 常<b>隐式存储</b>（只存 $v_i$）。</p>
+<h3>10.3 用 QR 解最小二乘</h3>
+<p>代入正规方程 $A=QR$、$Q^\top Q=I$：$R^\top Q^\top QRx=R^\top Q^\top b\Rightarrow\boxed{R_1x=Q_1^\top b}$（回代），最小残差$^2=\|Q_2^\top b\|_2^2$。</p>
+<blockquote>讲解：全程不碰 $A^\top A$，条件数没被平方，比法方程稳；$R_1$ 上三角直接回代。</blockquote>
+<h3>10.4 三种最小二乘解法对比</h3>
+<table><thead><tr><th>方法</th><th>复杂度</th><th>稳定性</th><th>备注</th></tr></thead><tbody><tr><td>法方程+Cholesky</td><td>$\sim mn^2+\tfrac13n^3$</td><td>最差（cond 平方）</td><td>最快，$A$ 良态够用</td></tr><tr><td>Gram-Schmidt(MGS)</td><td>$\sim 2mn^2$</td><td>中</td><td>出约化 QR</td></tr><tr><td>Householder QR</td><td>$\sim 2mn^2-\tfrac23n^3$</td><td>最好（后向稳定）</td><td>工业默认</td></tr></tbody></table>
+<blockquote>稳定性总排序：<b>SVD ≳ Householder &gt; MGS &gt; CGS &gt; 法方程</b>。</blockquote>
+<h3>10.5 Cholesky ↔ QR 关系（往年大题）</h3>
+<p>$A=QR\Rightarrow A^\top A=R^\top Q^\top QR=R^\top R$。</p>
+<blockquote>讲解：对 $A^\top A$ 做 Cholesky 得的 $L^\top$ 正是 QR 的 $R$（差每行正负号），即 $L=R^\top$。反向：$M=A(L^\top)^{-1}$ 可验 $M^\top M=I$（正交），则 $A=ML^\top$ 是约化 QR，$Q=M,R=L^\top$。会背 $A^\top A=R^\top R$ 比死算更重要。</blockquote>
+<hr>
+<h2>11. 特征值与特征向量</h2>
+<p><b>定义</b>：$Av=\lambda v$（$v\ne0$）$\Rightarrow(A-\lambda I)v=0\Rightarrow\boxed{\det(A-\lambda I)=0}$。$\lambda$=特征值，$v$=特征向量（方向，常取 $\|v\|_2=1$）。</p>
+<blockquote>讲解：特征向量是被 $A$ 只缩放、不转向的方向。</blockquote>
+<p><b>性质速查</b>：</p>
+<table><thead><tr><th>性质</th><th>结论</th></tr></thead><tbody><tr><td>迹</td><td>$\text{tr}(A)=\sum_i\lambda_i$</td></tr><tr><td>行列式</td><td>$\det(A)=\prod_i\lambda_i$</td></tr><tr><td>三角矩阵</td><td>特征值=<b>对角元</b>（别展开行列式）</td></tr><tr><td>逆 $A^{-1}$</td><td>特征值 $1/\lambda_i$，特征向量不变</td></tr><tr><td>移位 $A-\sigma I$</td><td>特征值 $\lambda_i-\sigma$，特征向量不变</td></tr><tr><td>秩 1 $uv^\top$</td><td>特征值 $\{u^\top v,\,0,\dots,0\}$</td></tr></tbody></table>
+<p><b>谱 / 谱半径</b>：谱=全体特征值集合；$\rho(A)=\max_i\lvert\lambda_i\rvert$。</p>
+<p><b>谱定理</b>（仅实对称 $A=A^\top$）🔑：① 特征值全实；② 不同特征值的特征向量正交；③ 可正交对角化 $\boxed{A=Q\Lambda Q^\top}$（$Q$ 正交）。</p>
+<blockquote>讲解：对称矩阵=沿一组互相垂直的轴各自拉伸（SVD 的根基）。复版本 Hermitian $A=A^*$ 同样实特征值。⚠️ 一般（非对称）矩阵特征值可复、特征向量未必正交，别乱套谱定理。</blockquote>
+<p><b>变分视角 / PCA</b>：$\max_x x^\top Ax$ s.t. $\|x\|_2=1$，拉格朗日 $\Rightarrow Ax=\lambda x$，最大值=<b>最大特征值</b>=数据方差最大方向=<b>第一主成分</b>。降维保留大特征值方向（信息多），丢小的。</p>
+<p><b>解 $Ay=b$（对称）</b>：$b=\sum_i c_ix_i$（$c_i=b^\top x_i$），$y=\sum_i(c_i/\lambda_i)x_i$。</p>
+<h3>11.1 幂迭代（Power Iteration，考纲不考计算、考概念）</h3>
+<p>$z^{(k)}=Aq^{(k-1)}$，$q^{(k)}=z^{(k)}/\|z^{(k)}\|_2$，$\lambda^{(k)}=\dfrac{(q^{(k)})^\top Aq^{(k)}}{(q^{(k)})^\top q^{(k)}}$（瑞利商读特征值）。</p>
+<blockquote>讲解：反复乘 $A$ 并归一化，向量收敛到<b>最大模</b>特征值对应的特征向量。⚠️ 找的是「绝对值最大」（$\lambda=-5$ 比 $\lambda=3$ 更主导，常见陷阱），不是代数值最大。<b>为何收敛</b>：$q_0$ 按特征向量展开，每乘一次 $A$ 第 $i$ 分量放大 $\lambda_i$ 倍，最大的一家独大。</blockquote>
+<p><b>适用条件</b>：① 存在<b>唯一主特征值</b> $\lvert\lambda_1\rvert>\lvert\lambda_2\rvert\ge\cdots$；② 可对角化方阵；③ 初始向量不与主特征向量正交。 <b>收敛速度</b>：$\propto\lvert\lambda_2/\lambda_1\rvert$（次主/主之比），越小越快。 ⚠️ <b>不收敛情形</b>：两个最大模特征值<b>绝对值相等</b>（如 $\lambda=\pm1$）→ 无唯一主导者，振荡不收敛（HW5.1）。秩 1 $uv^\top$ 则<b>一步收敛</b>（$Ax$ 已在 $u$ 方向）。</p>
+<p><b>变体</b>：</p>
+<ul><li style="margin-left:0.0em"><b>逆幂法</b>（求最小特征值）：对 $A^{-1}$ 幂迭代（特征值 $1/\lambda$），每步解 $Ax_{k+1}=x_k$（LU 一次、反复回代，不求逆）。</li><li style="margin-left:0.0em"><b>移位逆幂法</b>（求最接近 $\sigma$ 的）：对 $A-\sigma I$ 逆迭代。</li><li style="margin-left:0.0em"><b>瑞利商迭代</b>：每步用当前瑞利商当移位，<b>三次收敛</b>（极快）。</li></ul>
+<hr>
+<h2>12. SVD 分解 🔑</h2>
+<p><b>定义</b>：任意 $A\in\mathbb{R}^{m\times n}$，$\boxed{A=U\Sigma V^\top}$。</p>
+<table><thead><tr><th>矩阵</th><th>大小</th><th>性质</th></tr></thead><tbody><tr><td>$U$（左奇异向量）</td><td>$m\times m$</td><td>正交 $U^\top U=I$，列是 $AA^\top$ 特征向量，张成列空间</td></tr><tr><td>$\Sigma$（奇异值）</td><td>$m\times n$（同 $A$ 形）</td><td>矩形对角，$\sigma_1\ge\cdots\ge\sigma_r>0=\cdots$</td></tr><tr><td>$V$（右奇异向量）</td><td>$n\times n$</td><td>正交 $V^\top V=I$，列是 $A^\top A$ 特征向量，张成行空间</td></tr></tbody></table>
+<p>$\sigma_i=\sqrt{\lambda_i(A^\top A)}=\sqrt{\lambda_i(AA^\top)}\ge0$，非零奇异值个数 $=\text{rank}(A)=r$。⚠️ $U$ 是 $m\times m$、$V$ 是 $n\times n$，别搞反。</p>
+<blockquote><b>几何图景</b>：单位球 $\xrightarrow{A}$ 椭球，半轴长=$\sigma_i$、半轴方向=$u_i$。从右往左读 $A=U\Sigma V^\top$：① $V^\top$ 旋转（输入）→ ② $\Sigma$ 沿轴拉伸（第 $i$ 轴乘 $\sigma_i$）→ ③ $U$ 旋转（输出）。<b>任何线性变换 = 旋转→缩放→旋转</b>。桥：$A^\top A$ 对称半正定，谱定理对角化，特征值 $=\sigma_i^2$、特征向量 $=v_i$。</blockquote>
+<p><b>计算三步法</b> 🔑：① 求 $A^\top A$ 特征值/向量，归一化作 $V$，$\sigma_i=\sqrt{\lambda_i}$ <b>降序</b>；② $\Sigma$ 填对角；③ $u_i=\tfrac1{\sigma_i}Av_i$（非零部分），不足的从 $\text{Null}(A^\top)$ 补正交基。</p>
+<blockquote>💡 <b>速算技巧</b>：列两两正交的矩阵，奇异值=各列模长（按降序重排 $U,V$ 列）；单列向量 $\sigma=\|A\|,\ u_1=A/\|A\|,\ V=[1]$。⚠️ 别漏开方、别漏除 $\sigma$；奇异向量可整体变号。</blockquote>
+<p><b>条件数（SVD 视角）</b>：$\|A\|_2=\sigma_{\max}$，$\|A\|_F=\sqrt{\sum\sigma_i^2}$，$\text{cond}_2(A)=\sigma_{\max}/\sigma_{\min}$。</p>
+<p><b>解线性系统</b>：$A$ 方阵可逆 $\Rightarrow x=A^{-1}b=V\Sigma^{-1}U^\top b$，$\Sigma^{-1}_{ii}=1/\sigma_i$。</p>
+<p><b>伪逆（Moore-Penrose）</b>：$A^+=V\Sigma^+U^\top$，$\Sigma^+_{ii}=1/\sigma_i$（$\sigma_i>0$）否则 0。满足 $AA^+A=A$。</p>
+<blockquote>讲解：方阵可逆 $\Rightarrow A^+=A^{-1}$；过定 $m>n\Rightarrow A^+b$ 给<b>最小二乘解</b>；欠定 $m<n\Rightarrow A^+b$ 给<b>最小范数解</b>（$A^+=A^\top(AA^\top)^{-1}$）。秩亏只取非零 $\sigma$ 部分。</blockquote>
+<p><b>外积形式</b>：$A=\sum_{i=1}^r\sigma_iu_iv_i^\top$，$A^+=\sum_{\sigma_i>0}\dfrac{v_iu_i^\top}{\sigma_i}$。</p>
+<p><b>Eckart-Young（低秩逼近）</b> 🔑：最佳秩-$k$ 逼近 $A_k=\sum_{i=1}^k\sigma_iu_iv_i^\top$（保留前 $k$ 大奇异值），$\|A-A_k\|_2=\sigma_{k+1}$。</p>
+<blockquote>讲解：2-范数和 Frobenius 范数下都最优。大奇异值=主要信息，小奇异值=细节/噪声。用于图像压缩、降噪、PCA、推荐系统、Eigenfaces。</blockquote>
+<p><b>SVD 解 Tikhonov（奇异值滤波）</b>：$(A^\top A+\lambda I)x=A^\top b$ 解 $x=\sum_i\dfrac{\sigma_i}{\sigma_i^2+\lambda}(u_i^\top b)v_i$。</p>
+<blockquote>讲解：系数 $\sigma_i\gg\sqrt\lambda$ 时 $\approx1/\sigma_i$（保留），$\sigma_i\ll\sqrt\lambda$ 时 $\to0$（压制）。小奇异值方向最易被噪声放大（病态根源），Tikhonov 把它们「调暗」→ 更稳。</blockquote>
+<hr>
+<h2>13. 非线性求根 🔑</h2>
+<p><b>Lipschitz 连续</b>：$\lvert f(x)-f(y)\rvert\le c\lvert x-y\rvert$（变化率有上限 $c$，<b>不要求可导</b>）。$c<1$ 时为<b>压缩映射</b>（迭代收敛关键）。 <b>介值定理（IVT）</b>：$f$ 在 $[a,b]$ 连续且 $f(a)f(b)<0$（异号）$\Rightarrow(a,b)$ 内至少一根（二分法依据）。</p>
+<p><b>二分法</b>：要求 $f$ 连续 + $f(a)f(b)<0$，取中点 $m=\tfrac{a+b}{2}$，看 $f(m)$ 与哪端同号就替换那端（保持夹住根），区间每次减半。</p>
+<blockquote>讲解：<b>最稳</b>（无条件收敛，线性、每步误差减半），不需导数。$C^0\backslash C^1$（不可微）首选。</blockquote>
+<p><b>不动点迭代</b>：改写 $f(x)=0$ 为 $x=g(x)$，迭代 $x_{k+1}=g(x_k)$，误差 $E_k=\lvert x_k-x^*\rvert$。</p>
+<blockquote>讲解：收敛要求 $g$ 在根附近压缩 $\boxed{\lvert g'(x^*)\rvert<1}$（线性收敛，速率 $\lvert g'\rvert$）；若 $g'(x^*)=0$ 则二阶收敛。⚠️ $\lvert g'(x^*)\rvert\ge1$ 发散、不能用。<b>收敛看改写后的 $g$，不是 $f$</b>；同一 $f$ 不同改写收敛性可不同。</blockquote>
+<p><b>牛顿法</b> 🔑：$\boxed{x_{i+1}=x_i-\dfrac{f(x_i)}{f'(x_i)}}$（一阶泰勒 $0\approx f(x_i)+(x-x_i)f'(x_i)$，切线找零点）。</p>
+<blockquote>讲解：<b>二次收敛</b> $\lim\dfrac{e_{i+1}}{e_i^2}=\big\lvert\dfrac{f''(x^*)}{2f'(x^*)}\big\rvert$，但<b>仅当</b> $f\in C^2$、单根 $f'(x^*)\ne0$、初值够近。失效：$f'(x^*)=0$（重根退化为线性）、某步 $f'(x_k)=0$（除零）、初值太差发散。$f'$ 易求时首选。⚠️ 求根版用一阶（切线）、优化版用二阶（Hessian），别混。</blockquote>
+<p><b>割线法</b>：$\boxed{x_{i+1}=x_i-\dfrac{f(x_i)(x_i-x_{i-1})}{f(x_i)-f(x_{i-1})}}$。</p>
+<blockquote>讲解：用差商代替 $f'$（免算导数），需两个初值。超线性收敛，阶 $\alpha=\tfrac{1+\sqrt5}{2}\approx1.618$。⚠️ 每步用<b>最近两点</b>（求 $x_3$ 用 $x_1,x_2$）；从 $x_0,x_1$「迭代 3 次」得 $x_2,x_3,x_4$。$f'$ 计算代价高时首选。</blockquote>
+<h3>四方法对比表 🔑</h3>
+<table><thead><tr><th>方法</th><th>需要信息</th><th>收敛速度</th><th>保证收敛？</th><th>典型场景</th></tr></thead><tbody><tr><td><b>二分</b></td><td>连续+端点异号</td><td>线性（慢）</td><td><b>无条件</b>（最稳）</td><td>连续但<b>不可微</b></td></tr><tr><td><b>不动点</b></td><td>$x=g(x)$，$\lvert g'\rvert<1$</td><td>线性</td><td>仅压缩 $c<1$</td><td>给 Lipschitz $c<1$</td></tr><tr><td><b>牛顿</b></td><td>$f$ 和 $f'$</td><td><b>二次</b>（最快）</td><td>局部（好初值、$f'\ne0$）</td><td>$f'$ 易算</td></tr><tr><td><b>割线</b></td><td>只要 $f$（无 $f'$）</td><td>超线性（$\approx1.618$）</td><td>局部</td><td>$f'$ 难算</td></tr></tbody></table>
+<blockquote>💡 <b>条件→方法速记</b>：$f'$ 易算→牛顿；$f'$ 难算→割线；Lipschitz $c<1$→不动点；连续不可微→二分。</blockquote>
+<p><b>概念题模板</b>：</p>
+<ul><li style="margin-left:0.0em">「牛顿法一定二阶收敛吗？」不一定——需 ①初值够近 ②单根 $f'(x^*)\ne0$ ③$f''$ 连续有界，任一不满足可退化为线性甚至发散。</li><li style="margin-left:0.0em">「不动点何时失效」：$\lvert g'(x^*)\rvert\ge1$（非压缩）。</li><li style="margin-left:0.0em">「牛顿何时失效」：$f'(x)=0$（除零/重根）或初值太远。</li></ul>
+</body></html>
